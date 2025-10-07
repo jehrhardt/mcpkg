@@ -1,0 +1,11 @@
+[project]
+name = "mcpkg"
+version = "0.1.0"
+description = "The model context package mangager"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = ["mcp[cli]>=1.16.0"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
