@@ -6,22 +6,26 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
-    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        components: rustfmt, clippy
+        python-version-file: .python-version
+    - name: Install dependencies
+      run: uv sync
     - name: Check formatting
-      run: cargo fmt -- --check
+      run: uv run ruff format --check
     - name: Linting
-      run: cargo clippy -- -D warnings
+      run: uv run ruff check
+    - name: Type check
+      run: uv run pyright
     - name: Run tests
-      run: cargo test
+      run: uv run pytest
