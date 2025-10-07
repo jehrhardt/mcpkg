@@ -1,49 +1,34 @@
-# CLAUDE.md
+# Agent Guidelines for mcpkg
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Build/Test/Lint Commands
 
-## Project Overview
+- **Run server**: `uv run main.py` or `mise run dev` (with MCP inspector)
+- **Format code**: `uv run ruff format`
+- **Check formatting**: `uv run ruff format --check`
+- **Lint**: `uv run ruff check`
+- **Type check**: `uv run pyright`
+- **Run all tests**: `uv run pytest`
+- **Run single test**: `uv run pytest path/to/test_file.py::test_name`
+- **Install dependencies**: `uv sync`
+- **CI verification**: Run format check, lint, type check, and pytest before committing
 
-This is a Rust CLI application called `mcpkg` built with the Clap library for command-line argument parsing. The project is configured for the 2024 Rust edition and implements both CLI functionality and an MCP (Model Context Protocol) server using the `rmcp` library.
+## Code Style
 
-## Common Commands
+- **Language**: Python 3.13 (leverage modern Python features)
+- **Package manager**: `uv` (installed via mise)
+- **Formatter**: Ruff (used in CI)
+- **Linter**: Ruff (used in CI)
+- **Type checker**: Pyright with strict configuration
+- **Imports**: Standard library first, then third-party (mcp, typer), sort with ruff
+- **Type hints**: Required on all functions and variables; project uses pyright
+- **Docstrings**: Triple-quoted strings for all public functions (see main.py examples)
+- **Naming**: snake_case for functions/variables, descriptive names (e.g., `get_greeting`, `greet_user`)
+- **Decorators**: Use FastMCP decorators (@mcp.tool(), @mcp.resource(), @mcp.prompt())
+- **Error handling**: Use standard Python exceptions; add specific error types as needed
 
-### Building and Running
+## Project Context
 
-```bash
-cargo build
-cargo run
-cargo run -- init
-cargo run -- mcp
-```
-
-### Development Commands
-
-```bash
-cargo check      # Fast compilation check
-cargo test        # Run tests
-cargo clippy      # Linting
-cargo fmt         # Code formatting
-```
-
-## Architecture
-
-The project follows a modular structure:
-
-- `src/main.rs`: Entry point with async main that delegates to the CLI module
-- `src/cli.rs`: CLI implementation using Clap derive macros with subcommand architecture
-- `src/mcp.rs`: MCP server implementation using rmcp library with stdio transport
-
-### CLI Structure
-- Main `Cli` struct with optional subcommands using `arg_required_else_help = true`
-- `Commands` enum with `Init` and `Mcp` subcommands
-- Uses Clap 4.x with derive features for argument parsing
-
-### MCP Server Structure
-- `Server` struct implements both `ServerHandler` and prompt routing via `#[prompt_router]`
-- Supports prompts capability with example prompt implementation
-- Supports resources capability with example resource at `instruction://insights`
-- Uses stdio transport for communication
-- Built with rmcp 0.6.3 with transport-io features
-
-The application is designed to work as both a CLI tool and an MCP server, with the MCP functionality providing prompts and resources to MCP clients.
+- **Purpose**: Model Context Protocol (MCP) package manager
+- **Framework**: FastMCP for MCP server implementation
+- **Structure**: Tools, resources, and prompts defined via decorators
+- **Environment**: Virtual environment in `.venv`, Python 3.13 in `.python-version`
