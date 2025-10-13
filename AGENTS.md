@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build/Test/Lint Commands
 
-- **Run server**: `uv run main.py` or `mise run dev` (with MCP inspector)
+- **Run server**: `uv run mcpkg start` or `mise run dev` (with MCP inspector)
 - **Format code**: `uv run ruff format`
 - **Check formatting**: `uv run ruff format --check`
 - **Lint**: `uv run ruff check`
@@ -25,24 +25,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Type hints**: Required on all functions and variables; project uses pyright
 - **Docstrings**: Triple-quoted strings for all public functions (see main.py examples)
 - **Naming**: snake_case for functions/variables, descriptive names (e.g., `get_greeting`, `greet_user`)
-- **Decorators**: Use FastMCP decorators (@mcp.tool(), @mcp.resource(), @mcp.prompt())
+- **Decorators**: Use low-level MCP server decorators (@server.list_prompts(), @server.get_prompt())
 - **Error handling**: Use standard Python exceptions; add specific error types as needed
 
 ## Project Context
 
 - **Purpose**: Model Context Protocol (MCP) package manager
-- **Framework**: FastMCP for MCP server implementation
-- **Structure**: Tools, resources, and prompts defined via decorators
+- **Framework**: Low-level MCP server implementation, Typer for CLI
+- **Structure**: CLI commands defined via Typer, MCP handlers defined via server decorators
 - **Environment**: Virtual environment in `.venv`, Python 3.13 in `.python-version`
 
 ## Architecture
 
-The project follows a simple, single-file MCP server architecture:
+The project follows a modular CLI-based architecture:
 
-- **main.py**: MCP server implementation using FastMCP decorators
-  - `@mcp.tool()`: Exposes functions as MCP tools
-  - `@mcp.resource()`: Defines dynamic resources with URI templates
-  - `@mcp.prompt()`: Creates prompt templates
+- **main.py**: Entry point that launches the CLI via `run()` function
+- **cli.py**: Typer-based CLI with commands:
+  - `mcp`: Starts the MCP server
+- **mcp.py**: MCP server implementation using low-level MCP protocol
+  - Prompt handlers for listing and getting prompts
+  - Server runs via stdio_server for MCP communication
 - **test_main.py**: Pytest test suite
 - **.mcp.json**: MCP client configuration for connecting to the server
 - **CI/CD**: GitHub Actions workflow validates formatting, linting, type checking, and tests

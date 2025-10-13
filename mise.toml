@@ -3,4 +3,7 @@ _.file = '.env'
 
 [tasks.dev]
 description = "Run MCP server and connect via inspector"
-run = "uv run mcp dev main.py"
+run = "npx @modelcontextprotocol/inspector uv run mcpkg start"
+
+[tools]
+node = "lts"

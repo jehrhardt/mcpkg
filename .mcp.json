@@ -5,9 +5,10 @@
       "command": "uv",
       "args": [
         "run",
-        "mcp",
-        "run",
-        "main.py"
+        "python",
+        "-m",
+        "mcpkg.cli",
+        "mcp-command"
       ],
       "env": {}
     }

@@ -10,6 +10,9 @@ dependencies = [
     "typer>=0.19.2",
 ]
 
+[project.scripts]
+mcpkg = "mcpkg.main:run"
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
