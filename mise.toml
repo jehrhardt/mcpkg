@@ -1,3 +1,6 @@
+[env]
+_.file = '.env'
+
 [tasks.dev]
 description = "Run MCP server and connect via inspector"
 run = "uv run mcp dev main.py"
