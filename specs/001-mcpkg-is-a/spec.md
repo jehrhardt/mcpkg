@@ -26,6 +26,11 @@
 - Q: What metadata fields should resources support beyond name, URI, and content? → A: MIME type, description, created/updated timestamps
 - Q: Should prompts also have metadata fields like resources for consistency? → A: Description and created/updated timestamps (no MIME type)
 - Q: How should CLI commands specify which workspace to operate on? → A: Optional --workspace flag; defaults to "default" workspace if omitted
+- Q: What type of primary keys should database tables use? → A: UUIDs for all primary keys
+- Q: How should migration script versions be identified and ordered? → A: Date and time at beginning of migration filename (e.g., YYYYMMDDHHMMSS_description.sql)
+- Q: When database connection or migration fails during MCP server startup, how should it behave? → A: Fail immediately with descriptive error and exit code
+- Q: What logging behavior should the system provide during normal operation? → A: Log to stderr at info level by default
+- Q: What maximum length limit should apply to workspace, project, prompt, and resource names? → A: 255 characters
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -143,14 +148,16 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 
 ### Edge Cases
 
-- What happens when a workspace database file is corrupted or missing? System fails immediately with clear error message requiring manual intervention (user must restore from backup or delete corrupted file)
+- What happens when a workspace database file is corrupted or missing? System fails immediately with clear error message and non-zero exit code requiring manual intervention (user must restore from backup or delete corrupted file)
+- What happens when database connection fails during MCP server startup? System fails immediately with descriptive error message and non-zero exit code
+- What happens when database migration fails during MCP server startup? System fails immediately with descriptive error message and non-zero exit code, preventing server from starting in inconsistent state
 - What happens when user attempts to create a workspace or project with a duplicate name? CLI returns error message; MCP operations for projects are not supported (workspace/project management is CLI-only)
 - What happens when user attempts to add a prompt or resource with a name that already exists in the project? CLI returns error message; MCP tool returns structured error response with appropriate error code
 - What happens when user attempts to delete a workspace that contains a project being served by a running MCP server? System allows deletion; running MCP servers will encounter errors when trying to access deleted data
 - What happens when user attempts to delete a project while an MCP server is running with that project selected? System allows deletion; running MCP server will encounter errors when trying to access the deleted project
 - How does system handle concurrent access to the same workspace database from multiple processes? System allows multiple MCP server instances; SQLite built-in locking handles concurrent access (multiple readers, single writer)
-- What happens when a prompt or resource name contains special characters or exceeds length limits? System rejects names containing characters outside allowed set (a-z, A-Z, 0-9, -, _, .) with clear error message
-- What happens when user provides invalid characters in workspace or project names? System rejects with error message specifying allowed characters (alphanumeric, hyphen, underscore, dot)
+- What happens when a prompt or resource name contains special characters or exceeds length limits? System rejects names containing characters outside allowed set (a-z, A-Z, 0-9, -, _, .) or exceeding 255 characters with clear error message
+- What happens when user provides invalid characters in workspace or project names? System rejects with error message specifying allowed characters (alphanumeric, hyphen, underscore, dot) and maximum length (255 characters)
 
 ## Requirements *(mandatory)*
 
@@ -168,6 +175,7 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - **FR-008**: System MUST prevent creation of workspaces with duplicate names
 - **FR-008a**: System MUST restrict workspace names to alphanumeric characters, hyphens, underscores, and dots (a-z, A-Z, 0-9, -, _, .)
 - **FR-008b**: System MUST reject workspace names containing invalid characters with a clear error message
+- **FR-008c**: System MUST enforce a maximum length of 255 characters for workspace names
 
 #### Project Management
 
@@ -179,6 +187,7 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - **FR-013**: System MUST prevent creation of projects with duplicate names within the same workspace
 - **FR-013a**: System MUST restrict project names to alphanumeric characters, hyphens, underscores, and dots (a-z, A-Z, 0-9, -, _, .)
 - **FR-013b**: System MUST reject project names containing invalid characters with a clear error message
+- **FR-013c**: System MUST enforce a maximum length of 255 characters for project names
 
 #### Prompt Management
 
@@ -195,6 +204,7 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - **FR-019**: System MUST prevent creation of prompts with duplicate names within the same project
 - **FR-019a**: System MUST restrict prompt names to alphanumeric characters, hyphens, underscores, and dots (a-z, A-Z, 0-9, -, _, .)
 - **FR-019b**: System MUST reject prompt names containing invalid characters with a clear error message
+- **FR-019c**: System MUST enforce a maximum length of 255 characters for prompt names
 
 #### Resource Management
 
@@ -212,6 +222,7 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - **FR-026**: System MUST prevent creation of resources with duplicate identifiers within the same project
 - **FR-026a**: System MUST restrict resource names to alphanumeric characters, hyphens, underscores, and dots (a-z, A-Z, 0-9, -, _, .)
 - **FR-026b**: System MUST reject resource names containing invalid characters with a clear error message
+- **FR-026c**: System MUST enforce a maximum length of 255 characters for resource names
 
 #### MCP Integration
 
@@ -237,6 +248,7 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 #### Data Persistence
 
 - **FR-039**: System MUST persist all workspace, project, prompt, and resource data in SQLite 3 databases
+- **FR-039a**: System MUST use UUIDs as primary keys for all database tables (projects, prompts, resources)
 - **FR-040**: System MUST store resource content directly in the database (not as file references)
 - **FR-041**: System MUST maintain data integrity when working with multiple workspaces
 - **FR-042**: System MUST preserve all data when system is restarted
@@ -244,16 +256,27 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - **FR-044**: System MUST NOT attempt automatic recovery of corrupted database files
 - **FR-045**: System MUST allow multiple MCP server instances to run concurrently
 - **FR-046**: System MUST rely on SQLite's built-in locking mechanisms for concurrent database access
+- **FR-047**: System MUST name migration scripts using date-time prefix format (YYYYMMDDHHMMSS_description.sql)
+- **FR-048**: System MUST track the latest applied migration version in the database
+- **FR-049**: System MUST apply migrations in chronological order based on date-time prefix
+- **FR-050**: System MUST run pending migrations automatically when opening a workspace database
+- **FR-051**: System MUST fail MCP server startup immediately with descriptive error and non-zero exit code if database connection fails
+- **FR-052**: System MUST fail MCP server startup immediately with descriptive error and non-zero exit code if migration execution fails
+- **FR-053**: System MUST log operational messages to stderr at info level by default
+- **FR-054**: System MUST keep stdout reserved for data output (MCP protocol communication)
+- **FR-055**: System MUST log at minimum: server startup/shutdown, database connections, migration execution, and errors
 
 ### Key Entities
 
 - **Workspace**: Represents an isolated container for projects. Each workspace has a unique name and is backed by a separate SQLite 3 database file. A workspace named "default" is automatically created on first use. Users can specify different workspaces via the `--workspace` flag.
 
-- **Project**: Represents a logical grouping of related prompts and resources within a workspace. Each project has a unique name within its workspace and contains zero or more prompts and resources.
+- **Project**: Represents a logical grouping of related prompts and resources within a workspace. Each project has a UUID primary key, unique name within its workspace, and contains zero or more prompts and resources.
 
-- **Prompt**: Represents a reusable text prompt for AI coding agents. Each prompt has a unique name within its project, text content, optional metadata (description, created/updated timestamps), and belongs to exactly one project. Prompts are exposed via MCP for AI agent consumption.
+- **Prompt**: Represents a reusable text prompt for AI coding agents. Each prompt has a UUID primary key, unique name within its project, text content, optional metadata (description, created/updated timestamps), and belongs to exactly one project. Prompts are exposed via MCP for AI agent consumption.
 
-- **Resource**: Represents a file, documentation, or reference material for AI coding agents. Each resource has a unique identifier within its project, a URI for reference, content stored in the database, optional metadata (MIME type, description, created/updated timestamps), and belongs to exactly one project. Resources are exposed via MCP for AI agent consumption.
+- **Resource**: Represents a file, documentation, or reference material for AI coding agents. Each resource has a UUID primary key, unique identifier within its project, a URI for reference, content stored in the database, optional metadata (MIME type, description, created/updated timestamps), and belongs to exactly one project. Resources are exposed via MCP for AI agent consumption.
+
+- **Migration**: Database schema migration scripts named with date-time prefix (YYYYMMDDHHMMSS_description.sql). The system tracks the latest applied migration version and automatically applies pending migrations when opening a workspace database.
 
 ## Success Criteria *(mandatory)*
 
@@ -284,6 +307,8 @@ As an AI coding agent, I need to create, update, and delete prompts and resource
 - Resource URIs serve as identifiers and references; actual content is stored in the database
 - Resource content is stored as text or binary data in the database
 - Each MCP server instance serves content from exactly one project at a time
+- Logging to stderr at info level provides sufficient operational visibility for troubleshooting
+- Users can redirect stderr to a file if they need persistent logs
 
 ## Out of Scope *(mandatory)*
 
