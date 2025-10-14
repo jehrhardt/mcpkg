@@ -23,11 +23,11 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Add development dependencies to pyproject.toml (pytest>=8.4.2, pytest-asyncio>=0.24.0)
-- [ ] T002 Add runtime dependency to pyproject.toml (platformdirs>=4.3.6)
-- [ ] T003 Create pytest configuration file pytest.ini with asyncio_mode=auto
-- [ ] T004 Create mcpkg/tests/ directory structure (functional/, integration/, unit/)
-- [ ] T005 Create mcpkg/migrations/ directory for SQL migration files
+- [X] T001 Add development dependencies to pyproject.toml (pytest>=8.4.2, pytest-asyncio>=0.24.0)
+- [X] T002 Add runtime dependency to pyproject.toml (platformdirs>=4.3.6)
+- [X] T003 Create pytest configuration file pytest.ini with asyncio_mode=auto
+- [X] T004 Create mcpkg/tests/ directory structure (functional/, integration/, unit/)
+- [X] T005 Create mcpkg/migrations/ directory for SQL migration files
 
 ---
 
@@ -39,28 +39,28 @@
 
 ### Data Models and Validation
 
-- [ ] T006 [P] Write unit tests for name validation in mcpkg/tests/unit/test_validators.py
-- [ ] T007 [P] Implement name validation logic in mcpkg/validators.py (pattern: [a-zA-Z0-9._-]+, max 255 chars)
-- [ ] T008 [P] Write unit tests for data models in mcpkg/tests/unit/test_models.py
-- [ ] T009 [P] Implement data models (Workspace, Project, Prompt, Resource) as dataclasses in mcpkg/models.py
+- [X] T006 [P] Write unit tests for name validation in mcpkg/tests/unit/test_validators.py
+- [X] T007 [P] Implement name validation logic in mcpkg/validators.py (pattern: [a-zA-Z0-9._-]+, max 255 chars)
+- [X] T008 [P] Write unit tests for data models in mcpkg/tests/unit/test_models.py
+- [X] T009 [P] Implement data models (Workspace, Project, Prompt, Resource) as dataclasses in mcpkg/models.py
 
 ### Storage and Database Core
 
-- [ ] T010 [P] Write unit tests for storage path functions in mcpkg/tests/unit/test_storage.py
-- [ ] T011 [P] Implement storage module for OS data directory paths in mcpkg/storage.py (using platformdirs)
-- [ ] T012 Write integration tests for database operations in mcpkg/tests/integration/test_database.py
-- [ ] T013 Implement database connection and initialization in mcpkg/database.py (WAL mode, foreign keys enabled)
+- [X] T010 [P] Write unit tests for storage path functions in mcpkg/tests/unit/test_storage.py
+- [X] T011 [P] Implement storage module for OS data directory paths in mcpkg/storage.py (using platformdirs)
+- [X] T012 Write integration tests for database operations in mcpkg/tests/integration/test_database.py
+- [X] T013 Implement database connection and initialization in mcpkg/database.py (WAL mode, foreign keys enabled)
 
 ### Migration System
 
-- [ ] T014 Create initial schema migration in mcpkg/migrations/001_initial_schema.sql (projects, prompts, resources, schema_migrations tables)
-- [ ] T015 Write integration tests for migration system in mcpkg/tests/integration/test_migrations.py
-- [ ] T016 Implement migration logic in mcpkg/migrations.py (apply pending migrations on DB open)
+- [X] T014 Create initial schema migration in mcpkg/migrations/001_initial_schema.sql (projects, prompts, resources, schema_migrations tables)
+- [X] T015 Write integration tests for migration system in mcpkg/tests/integration/test_migrations.py
+- [X] T016 Implement migration logic in mcpkg/migrations.py (apply pending migrations on DB open)
 
 ### SQL Query Layer
 
-- [ ] T017 Write integration tests for SQL queries in mcpkg/tests/integration/test_queries.py
-- [ ] T018 Implement SQL query functions in mcpkg/queries.py (workspace, project, prompt, resource CRUD operations)
+- [X] T017 Write integration tests for SQL queries in mcpkg/tests/integration/test_queries.py
+- [X] T018 Implement SQL query functions in mcpkg/queries.py (workspace, project, prompt, resource CRUD operations)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -76,18 +76,18 @@
 
 **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T019 [P] [US1] Functional test for workspace list command in mcpkg/tests/functional/test_cli_workspace.py
-- [ ] T020 [P] [US1] Functional test for workspace create command in mcpkg/tests/functional/test_cli_workspace.py
-- [ ] T021 [P] [US1] Functional test for workspace delete command in mcpkg/tests/functional/test_cli_workspace.py
-- [ ] T022 [P] [US1] Functional test for default workspace auto-creation in mcpkg/tests/functional/test_cli_workspace.py
+- [X] T019 [P] [US1] Functional test for workspace list command in mcpkg/tests/functional/test_cli_workspace.py
+- [X] T020 [P] [US1] Functional test for workspace create command in mcpkg/tests/functional/test_cli_workspace.py
+- [X] T021 [P] [US1] Functional test for workspace delete command in mcpkg/tests/functional/test_cli_workspace.py
+- [X] T022 [P] [US1] Functional test for default workspace auto-creation in mcpkg/tests/functional/test_cli_workspace.py
 
 ### Implementation for User Story 1
 
-- [ ] T023 [US1] Implement workspace list command in mcpkg/cli.py (mcpkg workspace list)
-- [ ] T024 [US1] Implement workspace create command in mcpkg/cli.py (mcpkg workspace create <name>)
-- [ ] T025 [US1] Implement workspace delete command in mcpkg/cli.py (mcpkg workspace delete <name> --force)
-- [ ] T026 [US1] Add default workspace auto-creation logic to start command preparation in mcpkg/cli.py
-- [ ] T027 [US1] Add error handling and validation for workspace commands in mcpkg/cli.py
+- [X] T023 [US1] Implement workspace list command in mcpkg/cli.py (mcpkg workspace list)
+- [X] T024 [US1] Implement workspace create command in mcpkg/cli.py (mcpkg workspace create <name>)
+- [X] T025 [US1] Implement workspace delete command in mcpkg/cli.py (mcpkg workspace delete <name> --force)
+- [X] T026 [US1] Add default workspace auto-creation logic to start command preparation in mcpkg/cli.py
+- [X] T027 [US1] Add error handling and validation for workspace commands in mcpkg/cli.py
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can manage workspaces including automatic default workspace
 
@@ -101,18 +101,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T028 [P] [US2] Functional test for project create command in mcpkg/tests/functional/test_cli_project.py
-- [ ] T029 [P] [US2] Functional test for project list command in mcpkg/tests/functional/test_cli_project.py
-- [ ] T030 [P] [US2] Functional test for project rename command in mcpkg/tests/functional/test_cli_project.py
-- [ ] T031 [P] [US2] Functional test for project delete command in mcpkg/tests/functional/test_cli_project.py
+- [X] T028 [P] [US2] Functional test for project create command in mcpkg/tests/functional/test_cli_project.py
+- [X] T029 [P] [US2] Functional test for project list command in mcpkg/tests/functional/test_cli_project.py
+- [X] T030 [P] [US2] Functional test for project rename command in mcpkg/tests/functional/test_cli_project.py
+- [X] T031 [P] [US2] Functional test for project delete command in mcpkg/tests/functional/test_cli_project.py
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] Implement project create command in mcpkg/cli.py (mcpkg project create <name> --workspace <ws>)
-- [ ] T033 [US2] Implement project list command in mcpkg/cli.py (mcpkg project list --workspace <ws>)
-- [ ] T034 [US2] Implement project rename command in mcpkg/cli.py (mcpkg project rename <old> <new> --workspace <ws>)
-- [ ] T035 [US2] Implement project delete command in mcpkg/cli.py (mcpkg project delete <name> --workspace <ws> --force)
-- [ ] T036 [US2] Add error handling and validation for project commands in mcpkg/cli.py
+- [X] T032 [US2] Implement project create command in mcpkg/cli.py (mcpkg project create <name> --workspace <ws>)
+- [X] T033 [US2] Implement project list command in mcpkg/cli.py (mcpkg project list --workspace <ws>)
+- [X] T034 [US2] Implement project rename command in mcpkg/cli.py (mcpkg project rename <old> <new> --workspace <ws>)
+- [X] T035 [US2] Implement project delete command in mcpkg/cli.py (mcpkg project delete <name> --workspace <ws> --force)
+- [X] T036 [US2] Implement error handling and validation for project commands in mcpkg/cli.py
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - workspace and project management complete
 
