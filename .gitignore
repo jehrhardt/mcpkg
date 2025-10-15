@@ -11,3 +11,6 @@ wheels/
 
 # Dev environment variables
 .env
+
+# Obsidian config
+.obsidian
