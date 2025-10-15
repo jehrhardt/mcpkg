@@ -192,6 +192,7 @@ def test_create_resource(db_connection: sqlite3.Connection) -> None:
 
 def test_list_resources(db_connection: sqlite3.Connection) -> None:
     project = create_project(db_connection, "test-project")
+    assert project.id is not None
 
     create_resource(
         db_connection,
