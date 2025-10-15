@@ -1,4 +1,3 @@
-from pathlib import Path
 from typer.testing import CliRunner
 
 import pytest
@@ -52,7 +51,9 @@ def test_workspace_create_invalid_name(runner: CliRunner) -> None:
     result = runner.invoke(app, ["workspace", "create", "invalid workspace"])
 
     assert result.exit_code != 0
-    assert "invalid characters" in result.stdout or "invalid characters" in result.stderr
+    assert (
+        "invalid characters" in result.stdout or "invalid characters" in result.stderr
+    )
 
 
 def test_workspace_list_shows_workspaces(runner: CliRunner) -> None:

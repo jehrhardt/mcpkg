@@ -1,7 +1,6 @@
 from datetime import datetime
 from pathlib import Path
 
-import pytest
 from mcpkg.models import Project, Prompt, Resource, Workspace
 
 

@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 from mcpkg.database import initialize_database
 from mcpkg.migrations import apply_migrations
-from mcpkg.models import Project, Prompt, Resource
 from mcpkg.queries import (
     create_project,
     create_prompt,
@@ -195,10 +194,22 @@ def test_list_resources(db_connection: sqlite3.Connection) -> None:
     project = create_project(db_connection, "test-project")
 
     create_resource(
-        db_connection, project.id, "resource1", "file:///r1.md", b"Content1", None, None  # type: ignore[arg-type]
+        db_connection,
+        project.id,
+        "resource1",
+        "file:///r1.md",
+        b"Content1",
+        None,
+        None,  # type: ignore[arg-type]
     )
     create_resource(
-        db_connection, project.id, "resource2", "file:///r2.md", b"Content2", None, None  # type: ignore[arg-type]
+        db_connection,
+        project.id,
+        "resource2",
+        "file:///r2.md",
+        b"Content2",
+        None,
+        None,  # type: ignore[arg-type]
     )
 
     resources = list_resources(db_connection, project.id)  # type: ignore[arg-type]

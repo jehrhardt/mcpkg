@@ -19,9 +19,7 @@ def create_project(conn: sqlite3.Connection, name: str) -> Project:
     )
     row = cursor.fetchone()
 
-    return Project(
-        id=row[0], name=row[1], created_at=datetime.fromisoformat(row[2])
-    )
+    return Project(id=row[0], name=row[1], created_at=datetime.fromisoformat(row[2]))
 
 
 def list_projects(conn: sqlite3.Connection) -> list[Project]:

@@ -1,5 +1,4 @@
 import asyncio
-import sys
 from pathlib import Path
 
 import typer
@@ -73,7 +72,9 @@ def workspace_create(name: str) -> None:
 
 
 @workspace_app.command("delete")
-def workspace_delete(name: str, force: bool = typer.Option(False, "--force", "-f")) -> None:
+def workspace_delete(
+    name: str, force: bool = typer.Option(False, "--force", "-f")
+) -> None:
     """Delete a workspace and its database file."""
     db_path = get_workspace_db_path(name)
 
@@ -208,7 +209,9 @@ def project_rename_cmd(
         typer.echo(f"Error: Failed to rename project: {e}", err=True)
         raise typer.Exit(1)
 
-    typer.echo(f"Renamed project '{old_name}' to '{new_name}' in workspace '{workspace}'")
+    typer.echo(
+        f"Renamed project '{old_name}' to '{new_name}' in workspace '{workspace}'"
+    )
 
 
 @project_app.command("delete")

@@ -47,7 +47,9 @@ def test_project_create_invalid_name(runner: CliRunner) -> None:
     )
 
     assert result.exit_code != 0
-    assert "invalid characters" in result.stdout or "invalid characters" in result.stderr
+    assert (
+        "invalid characters" in result.stdout or "invalid characters" in result.stderr
+    )
 
 
 def test_project_list_empty(runner: CliRunner) -> None:

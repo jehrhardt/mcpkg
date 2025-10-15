@@ -88,7 +88,7 @@ def test_apply_migrations_is_idempotent(
 
 
 def test_get_current_version_returns_zero_for_new_database(
-    db_connection: sqlite3.Connection
+    db_connection: sqlite3.Connection,
 ) -> None:
     version = get_current_version(db_connection)
     assert version == 0

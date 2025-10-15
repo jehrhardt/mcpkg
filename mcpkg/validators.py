@@ -9,7 +9,9 @@ def validate_name(name: str, entity_type: str) -> None:
         raise ValueError(f"{entity_type} name cannot be empty")
 
     if len(name) > MAX_NAME_LENGTH:
-        raise ValueError(f"{entity_type} name exceeds maximum length of {MAX_NAME_LENGTH} characters")
+        raise ValueError(
+            f"{entity_type} name exceeds maximum length of {MAX_NAME_LENGTH} characters"
+        )
 
     if not NAME_PATTERN.match(name):
         raise ValueError(
