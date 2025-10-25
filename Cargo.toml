@@ -1,5 +1,5 @@
 [package]
-name = "mcpkg"
+name = "twig"
 version = "0.1.0"
 edition = "2024"
 

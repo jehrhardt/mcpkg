@@ -24,7 +24,7 @@ impl ServerHandler for Server {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
             server_info: Implementation {
-                name: "mcpkg".to_string(),
+                name: "twig".to_string(),
                 version: "dev".to_string(),
                 icons: None,
                 website_url: None,
