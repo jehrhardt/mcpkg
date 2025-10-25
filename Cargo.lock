@@ -395,15 +395,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 
 [[package]]
-name = "mcpkg"
-version = "0.1.0"
-dependencies = [
- "clap",
- "rmcp",
- "tokio",
-]
-
-[[package]]
 name = "memchr"
 version = "2.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -805,6 +796,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9d12581f227e93f094d3af2ae690a574abb8a2b9b7a96e7cfe9647b2b617678"
 dependencies = [
  "once_cell",
+]
+
+[[package]]
+name = "twig"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "rmcp",
+ "tokio",
 ]
 
 [[package]]
