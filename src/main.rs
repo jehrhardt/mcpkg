@@ -1,7 +1,3 @@
-mod cli;
-mod mcp;
-
-#[tokio::main]
-async fn main() {
-    cli::run().await;
+fn main() {
+    println!("Hello, world!");
 }
