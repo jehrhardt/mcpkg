@@ -6,10 +6,10 @@ app = typer.Typer(no_args_is_help=True)
 @app.command()
 def start() -> None:
     """Start the MCP server."""
-    import mcpkg.mcp
+    import twig.mcp
     import asyncio
 
-    asyncio.run(mcpkg.mcp.run())
+    asyncio.run(twig.mcp.run())
 
 
 @app.command()

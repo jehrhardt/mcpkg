@@ -9,7 +9,7 @@ from mcp.types import (
     TextContent,
 )
 
-server = Server("mcpkg")
+server = Server("twig")
 
 
 @server.list_prompts()
@@ -58,7 +58,7 @@ async def run() -> None:
             read_stream,
             write_stream,
             InitializationOptions(
-                server_name="mcpkg",
+                server_name="twig",
                 server_version="dev",
                 capabilities=server.get_capabilities(
                     notification_options=NotificationOptions(),
