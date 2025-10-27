@@ -2,22 +2,30 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-      - name: Check formatting
-        run: cargo fmt -- --check
-      - name: Linting
-        run: cargo clippy -- -D warnings
-      - name: Run tests
-        run: cargo test
+    - uses: actions/checkout@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version-file: .python-version
+    - name: Install dependencies
+      run: uv sync
+    - name: Check formatting
+      run: uv run ruff format --check
+    - name: Linting
+      run: uv run ruff check
+    - name: Type check
+      run: uv run pyright
+    - name: Run tests
+      run: uv run pytest

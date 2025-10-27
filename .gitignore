@@ -11,8 +11,3 @@ wheels/
 
 # Dev environment variables
 .env
-
-
-# Added by cargo
-
-/target
