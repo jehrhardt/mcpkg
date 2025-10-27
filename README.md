@@ -1,3 +1,3 @@
-# mcpkg
+# twig
 
-The model context package manager
+Help your coding agent twig.

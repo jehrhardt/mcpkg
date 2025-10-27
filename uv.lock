@@ -344,37 +344,6 @@ cli = [
 ]
 
 [[package]]
-name = "mcpkg"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "mcp", extra = ["cli"] },
-    { name = "supabase" },
-    { name = "typer" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pyright" },
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "mcp", extras = ["cli"], specifier = ">=1.16.0" },
-    { name = "supabase", specifier = ">=2.22.0" },
-    { name = "typer", specifier = ">=0.19.2" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pyright", specifier = ">=1.1.406" },
-    { name = "pytest", specifier = ">=8.4.2" },
-    { name = "ruff", specifier = ">=0.14.0" },
-]
-
-[[package]]
 name = "mdurl"
 version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -982,6 +951,37 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/de/6f/d684f70d2bbbd181f5a9a7b60a9b4d0045187d0f8e9715e1d07d3da75220/supabase_functions-2.22.0.tar.gz", hash = "sha256:dfc04c0c751629813e75153124b7f1bc81ff0128d058f6deaed2f124782416fa", size = 4649, upload-time = "2025-10-08T19:32:55.483Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/26/9b/091d894b282b49bcd49c735bb259631431f40b8448ac3c3e7a261ac05f74/supabase_functions-2.22.0-py3-none-any.whl", hash = "sha256:c92d1b832499abfa8bde248d674aeb5f03b511d29959bf3d16afcdab824b290c", size = 8660, upload-time = "2025-10-08T19:32:54.696Z" },
+]
+
+[[package]]
+name = "twig"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "mcp", extra = ["cli"] },
+    { name = "supabase" },
+    { name = "typer" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "mcp", extras = ["cli"], specifier = ">=1.16.0" },
+    { name = "supabase", specifier = ">=2.22.0" },
+    { name = "typer", specifier = ">=0.19.2" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyright", specifier = ">=1.1.406" },
+    { name = "pytest", specifier = ">=8.4.2" },
+    { name = "ruff", specifier = ">=0.14.0" },
 ]
 
 [[package]]
