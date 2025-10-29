@@ -1,5 +1,8 @@
 site_name: twig
 site_url: https://twig.sh
+repo_url: https://github.com/twig-hq/twig
+repo_name: twig-hq/twig
+edit_uri: edit/main/docs/
 theme:
   name: material
   favicon: assets/cozy-logo.svg
@@ -25,6 +28,8 @@ theme:
         icon: material/brightness-4
         name: Switch to system preference
   custom_dir: overrides
+  features:
+    - content.action.edit
 extra:
   analytics:
     provider: plausible
