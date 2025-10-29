@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Welcome to twig","text":"<p><code>twig</code> is currently under development and will allow you and your team to share prompts and resources across projects and different AI agents.</p> <p>Curious? Check out the project on Github.</p>"}]}
