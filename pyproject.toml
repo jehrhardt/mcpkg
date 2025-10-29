@@ -19,7 +19,6 @@ venv = ".venv"
 
 [dependency-groups]
 dev = [
-    "mkdocs-material>=9.6.22",
     "pyright>=1.1.406",
     "pytest>=8.4.2",
     "ruff>=0.14.0",
