@@ -1,126 +1,230 @@
-<!--
-Sync Impact Report:
-- Version change: N/A (initial) → 1.0.0
-- New principles added:
-  * I. Code Quality Excellence
-  * II. Testing Standards
-  * III. User Experience Consistency
-  * IV. Performance Requirements
-- New sections added:
-  * Development Standards
-  * Quality Gates
-  * Governance
-- Templates requiring updates:
-  ✅ plan-template.md - Constitution Check section aligns with principles
-  ✅ spec-template.md - Success criteria align with performance requirements
-  ✅ tasks-template.md - Task categorization supports testing discipline
-- Follow-up TODOs: None
--->
+# Twig Constitution
 
-# mcpkg Constitution
+<!--
+═════════════════════════════════════════════════════════════════════════════
+SYNC IMPACT REPORT
+═════════════════════════════════════════════════════════════════════════════
+Version Change: [NONE] → 1.0.0
+
+Modified Principles: N/A (initial version)
+
+Added Sections:
+  - Core Principles (5 principles focused on code quality, testing, DX)
+  - Development Standards (code style, error handling, async patterns)
+  - Quality Gates (CI requirements and enforcement)
+  - Governance (amendment procedures and compliance)
+
+Removed Sections: N/A (initial version)
+
+Templates Requiring Updates:
+  ✅ .specify/templates/plan-template.md - Constitution Check gate already present
+  ✅ .specify/templates/spec-template.md - Acceptance criteria align with testing principle
+  ✅ .specify/templates/tasks-template.md - Test-first approach matches tasks structure
+  ✅ .specify/templates/agent-file-template.md - Generic template, no changes needed
+  ✅ .specify/templates/checklist-template.md - Generic template, no changes needed
+
+Follow-up TODOs: None - all placeholders filled
+
+Rationale for 1.0.0:
+  - Initial constitution establishing governance framework
+  - Defines non-negotiable principles for code quality and testing
+  - Sets baseline for all future development
+═════════════════════════════════════════════════════════════════════════════
+-->
 
 ## Core Principles
 
-### I. Code Quality Excellence
+### I. Zero-Tolerance Code Quality
 
-All code MUST meet rigorous quality standards before merge:
+All code MUST pass automated quality gates before merge. No exceptions.
 
-- **Zero warnings tolerance**: All clippy warnings treated as errors (`-D warnings`)
-- **Consistent formatting**: All code formatted with `rustfmt` defaults
-- **Proper error handling**: Use `Result<T, E>` with domain-specific error types; MUST NOT use `unwrap()` or `expect()` in library code
-- **Import organization**: Group imports as std, external crates, then local modules; alphabetical within groups
-- **Naming conventions**: snake_case for functions/variables, PascalCase for types/traits
-- **Documentation**: Public APIs MUST have doc comments (`///`)
+**Rules:**
+- `cargo clippy -- -D warnings`: Warnings are treated as errors
+- `cargo fmt -- --check`: Code must be formatted before commit
+- `cargo test`: All tests must pass in CI
+- `cargo build --release`: Release builds must succeed
 
-**Rationale**: Rust's type system and tooling enable catching errors at compile time; leveraging these tools maximally reduces runtime defects and maintenance burden.
+**Rationale:** Automated enforcement prevents quality erosion and ensures
+consistent codebase standards. Manual review cannot catch formatting and
+lint issues as reliably as tooling.
 
-### II. Testing Standards
+### II. Test-First Development (NON-NEGOTIABLE)
 
-Testing is NON-NEGOTIABLE and follows strict discipline:
+Tests MUST be written before implementation. No feature ships without tests.
 
-- **Test coverage**: All public APIs MUST have unit tests
-- **Test clarity**: Tests MUST have clear Given-When-Then structure or equivalent
-- **Integration tests**: New features involving CLI interaction or MCP protocol MUST include integration tests
-- **Test location**: Unit tests in module or `tests/unit/`, integration tests in `tests/integration/`, contract tests for MCP protocol in `tests/contract/`
-- **No flaky tests**: Tests MUST be deterministic; randomness/timing dependencies require justification
-- **Tests as documentation**: Test names MUST clearly describe the scenario being tested
+**Rules:**
+- Write test → Verify test fails → Implement → Verify test passes
+- Unit tests for business logic and utilities
+- Integration tests for MCP protocol handlers and tool interactions
+- Contract tests for external interfaces (stdio transport, tool schemas)
+- Test naming: `test_<function>_<scenario>_<expected_outcome>`
+- Tests must be independently runnable: `cargo test test_name`
 
-**Rationale**: mcpkg is infrastructure tooling managing model context packages; failures impact developer workflows directly. Comprehensive testing ensures reliability and enables confident refactoring.
+**Rationale:** Test-first development catches bugs early, documents behavior,
+and ensures features work as specified. Retrofitting tests after
+implementation often results in tests that match the implementation rather
+than the requirements.
 
-### III. User Experience Consistency
+### III. Explicit Over Implicit
 
-User-facing behavior MUST be predictable and consistent:
+Code clarity beats cleverness. Prefer explicit types and error handling.
 
-- **Error messages**: MUST be actionable, include context, and suggest resolution steps
-- **CLI patterns**: Follow established CLI conventions (flags, subcommands, help text)
-- **Output formats**: Support both human-readable and machine-parseable (JSON) output where applicable
-- **Stdin/stdout protocol**: Read from stdin/args, write results to stdout, errors to stderr
-- **Progress feedback**: Long-running operations MUST provide progress indication
-- **Exit codes**: Use conventional exit codes (0 success, 1 general error, specific codes for specific failures)
+**Rules:**
+- Function signatures MUST use explicit types (no type inference)
+- Function bodies MAY use type inference for local variables
+- Error handling: `Result<T, ErrorData>` for MCP handlers, `.expect()` with
+  descriptive messages for setup code
+- Avoid `unwrap()` except in tests or prototypes
+- Document non-obvious behavior with inline comments
 
-**Rationale**: As a package manager, mcpkg integrates into automation and developer workflows; consistency reduces friction and enables reliable scripting.
+**Rationale:** Rust's type system is a powerful tool for correctness. Explicit
+signatures serve as living documentation and help catch errors at compile
+time. Clear error messages reduce debugging time.
 
-### IV. Performance Requirements
+### IV. Developer Experience Consistency
 
-Performance MUST meet user expectations for a package manager:
+Tooling and workflows MUST be consistent across all developer environments.
 
-- **Response time**: Interactive commands MUST respond within 100ms for local operations
-- **Throughput**: Package operations MUST handle batches efficiently (target: 50+ packages/sec for metadata reads)
-- **Memory usage**: Peak memory MUST stay under 100MB for typical operations (up to 1000 packages)
-- **Startup time**: CLI startup overhead MUST be under 50ms
-- **Network efficiency**: Remote operations MUST use connection pooling and implement request batching where applicable
+**Rules:**
+- Use `mise` for environment management (defined in `mise.toml`)
+- Commands documented in `AGENTS.md` and verified in CI
+- Dev tools: `mise run dev:mcp` (MCP inspector), `mise run dev:page` (docs)
+- Standard project structure: `src/` for source, `tests/` for tests,
+  `website/docs/` for documentation
+- Dependencies locked in `Cargo.lock` (committed to repo)
 
-**Rationale**: Package managers are invoked frequently during development; performance directly impacts developer productivity and satisfaction.
+**Rationale:** Inconsistent environments lead to "works on my machine"
+problems. Standardizing on `mise` and documented commands reduces onboarding
+friction and environment-specific bugs.
+
+### V. Small, Focused Modules
+
+Each module has a single, clear responsibility. Complexity requires
+justification.
+
+**Rules:**
+- Modules: `cli` (command parsing), `mcp` (MCP server logic), `main` (entry)
+- Use `pub(crate)` for internal APIs, `pub` only for public interfaces
+- Group imports: stdlib → external crates → `use crate::`
+- Maximum file length: 500 lines (exceptions require justification in PR)
+- Async runtime: `tokio` with "full" features (declared once in `main.rs`)
+
+**Rationale:** Small modules are easier to understand, test, and maintain.
+Clear boundaries prevent coupling and make refactoring safer.
 
 ## Development Standards
 
-**Build verification**: All changes MUST pass before commit:
+### Code Style & Conventions
 
-1. `cargo fmt -- --check` (formatting)
-2. `cargo clippy -- -D warnings` (linting)
-3. `cargo test` (all tests)
+**Rust Edition:** 2024
 
-**Dependency management**:
+**Naming:**
+- `snake_case` for functions, variables, modules
+- `PascalCase` for types, structs, enums, traits
+- `SCREAMING_SNAKE_CASE` for constants
 
-- New dependencies require justification (avoid duplication, evaluate maintenance status)
-- Use minimal feature flags to reduce compilation time and binary size
-- Document why each major dependency was chosen in project documentation
+**Imports:**
+1. Standard library (`use std::*`)
+2. External crates (`use clap::*`, `use rmcp::*`, `use tokio::*`)
+3. Internal modules (`use crate::cli::*`, `use crate::mcp::*`)
 
-**Edition policy**: Use latest stable Rust edition (currently 2024); edition upgrades require validation across CI
+**Formatting:** Enforced by `cargo fmt` (default rustfmt rules)
+
+### Error Handling
+
+- MCP handlers: Return `Result<T, ErrorData>` (from `rmcp` crate)
+- Setup code: Use `.expect("descriptive message")` for panics
+- Avoid `unwrap()` in production code paths
+- Log errors before returning them to callers
+
+### Async Patterns
+
+- Use `#[tokio::main]` for async entry points
+- Use `async fn` for async functions
+- Prefer structured concurrency (spawn with join handles)
+- Document blocking operations in async contexts
+
+### Visibility
+
+- Default to private (`fn`, `struct`)
+- Use `pub(crate)` for internal APIs
+- Use `pub` only for APIs exposed to external consumers
+- Document all `pub` items with `///` doc comments
+
+### Type Inference
+
+- MUST: Explicit types in function signatures
+- MAY: Type inference in function bodies
+- Document complex type inferences with inline comments
 
 ## Quality Gates
 
-All pull requests MUST satisfy:
+### Pre-Commit
 
-1. **CI passes**: All automated checks green (format, lint, test)
-2. **Review approval**: At least one maintainer approval
-3. **Documentation**: Public API changes include doc updates
-4. **Changelog**: User-visible changes documented in changelog
-5. **Test coverage**: New functionality includes tests
+Developers SHOULD run these locally before committing:
+- `cargo fmt` - Auto-format code
+- `cargo clippy -- -D warnings` - Lint with warnings as errors
+- `cargo test` - Run all tests
 
-Breaking changes MUST additionally include:
+### Continuous Integration
 
-- Migration guide for users
-- Version bump rationale (semantic versioning: MAJOR.MINOR.PATCH)
-- Deprecation warnings in prior minor version when feasible
+CI MUST enforce these on every push:
+- `cargo fmt -- --check` - Verify formatting
+- `cargo clippy -- -D warnings` - Verify no warnings
+- `cargo test` - Verify all tests pass
+- `cargo build --release` - Verify release build succeeds
+
+**Failure Mode:** Any gate failure blocks merge. No exceptions.
+
+### Pre-Release
+
+Before tagging a release:
+- All CI gates MUST pass
+- Documentation MUST be updated (`website/docs/`)
+- `AGENTS.md` MUST reflect current commands and conventions
+- Version MUST be bumped in `Cargo.toml`
 
 ## Governance
 
-**Authority**: This constitution supersedes all other development practices and guidelines.
+### Amendment Procedure
 
-**Compliance**:
+1. Propose amendment via pull request to `constitution.md`
+2. Document rationale in PR description
+3. Update version number:
+   - MAJOR: Backward-incompatible principle changes (remove/redefine)
+   - MINOR: New principle or materially expanded guidance
+   - PATCH: Clarifications, wording fixes, non-semantic changes
+4. Update Sync Impact Report (HTML comment at top of file)
+5. Propagate changes to dependent templates in `.specify/templates/`
+6. Require approval from project maintainers
+7. Merge only after all affected documentation updated
 
-- All code reviews MUST verify compliance with principles
-- Violations require explicit justification and documentation
-- Complexity beyond these principles MUST be defended with clear rationale
+### Versioning Policy
 
-**Amendments**:
+This constitution follows semantic versioning:
+- Version format: `MAJOR.MINOR.PATCH`
+- MAJOR: Breaking changes to governance or principles
+- MINOR: New principles or sections added
+- PATCH: Clarifications and refinements
 
-- Amendments require documentation of motivation and impact analysis
-- Breaking changes to constitution require MAJOR version bump
-- New principles or significant expansions require MINOR version bump
-- Clarifications and refinements require PATCH version bump
+### Compliance Review
 
-**Runtime guidance**: Day-to-day development guidance for agents is maintained in `AGENTS.md`; constitution principles take precedence over AGENTS.md in case of conflict.
+- All pull requests MUST reference relevant principles
+- Complexity exceptions MUST be justified in PR (see plan-template.md
+  "Complexity Tracking" section)
+- Templates in `.specify/templates/` define how principles are applied to
+  feature planning and task breakdown
+- `AGENTS.md` serves as runtime development guidance for agents and developers
 
-**Version**: 1.0.0 | **Ratified**: 2025-10-22 | **Last Amended**: 2025-10-22
+### Template Alignment
+
+- **plan-template.md**: Constitution Check gate validates compliance before
+  Phase 0 research
+- **spec-template.md**: Acceptance scenarios align with test-first principle
+- **tasks-template.md**: Test-first task ordering (tests → implementation)
+- **agent-file-template.md**: Generic template, no constitution-specific
+  constraints
+- **checklist-template.md**: Generic template, no constitution-specific
+  constraints
+
+**Version**: 1.0.0 | **Ratified**: 2025-11-03 | **Last Amended**: 2025-11-03
