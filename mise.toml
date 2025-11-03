@@ -3,7 +3,7 @@ _.file = '.env'
 
 [tasks."dev:mcp"]
 description = "Run MCP server and connect via inspector"
-run = "npx @modelcontextprotocol/inspector uv run -m twig.main start"
+run = "npx @modelcontextprotocol/inspector cargo run -- start"
 
 [tasks."dev:page"]
 description = "Locally serve project webpage"

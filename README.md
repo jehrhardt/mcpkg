@@ -4,7 +4,10 @@ Help your coding agent twig.
 
 ## Prerequisites
 
-`twig` uses [mise](https://mise.jdx.dev) to setup the development environment.
+`twig` uses the following tools for development:
+
+- [mise](https://mise.jdx.dev)
+- [Rust](https://rust-lang.org/tools/install/)
 
 ## Usage
 
@@ -12,7 +15,6 @@ Setup development environment and install dependencies:
 
 ```bash
 mise install
-uv sync
 ```
 
 Run MCP inspector and connect to `twig`:

@@ -1,177 +1,230 @@
-# Twig Project Constitution
+# Twig Constitution
 
 <!--
-SYNC IMPACT REPORT:
-Version change: N/A (initial) → 1.0.0
-Modified principles: N/A (initial version)
-Added sections:
-  - I. Type Safety & Code Quality
-  - II. Test-First Development (NON-NEGOTIABLE)
-  - III. Developer Experience Consistency
-  - IV. Simple, Maintainable Architecture
-  - V. Tooling Standardization
-  - Development Workflow
-  - Quality Gates
-Removed sections: None (initial version)
+═════════════════════════════════════════════════════════════════════════════
+SYNC IMPACT REPORT
+═════════════════════════════════════════════════════════════════════════════
+Version Change: [NONE] → 1.0.0
 
-Templates requiring updates:
-  ✅ .specify/templates/plan-template.md - Constitution Check section aligns with new principles
-  ✅ .specify/templates/spec-template.md - Requirements and acceptance scenarios support testability
-  ✅ .specify/templates/tasks-template.md - Task structure supports test-first workflow and code quality gates
-  ⚠ No command files found in .specify/templates/commands/ - no updates needed
+Modified Principles: N/A (initial version)
+
+Added Sections:
+  - Core Principles (5 principles focused on code quality, testing, DX)
+  - Development Standards (code style, error handling, async patterns)
+  - Quality Gates (CI requirements and enforcement)
+  - Governance (amendment procedures and compliance)
+
+Removed Sections: N/A (initial version)
+
+Templates Requiring Updates:
+  ✅ .specify/templates/plan-template.md - Constitution Check gate already present
+  ✅ .specify/templates/spec-template.md - Acceptance criteria align with testing principle
+  ✅ .specify/templates/tasks-template.md - Test-first approach matches tasks structure
+  ✅ .specify/templates/agent-file-template.md - Generic template, no changes needed
+  ✅ .specify/templates/checklist-template.md - Generic template, no changes needed
 
 Follow-up TODOs: None - all placeholders filled
+
+Rationale for 1.0.0:
+  - Initial constitution establishing governance framework
+  - Defines non-negotiable principles for code quality and testing
+  - Sets baseline for all future development
+═════════════════════════════════════════════════════════════════════════════
 -->
 
 ## Core Principles
 
-### I. Type Safety & Code Quality
+### I. Zero-Tolerance Code Quality
 
-All code MUST be type-checked and linted before commit. This is enforced through:
+All code MUST pass automated quality gates before merge. No exceptions.
 
-- **Pyright** for static type checking with strict mode enabled
-- **Ruff** for linting and formatting with zero tolerance for errors
-- All functions MUST have type annotations for parameters and return values
-- No `Any` types unless explicitly justified in code comments
-- All code MUST pass `uv run ruff check` and `uv run pyright` with zero errors
+**Rules:**
+- `cargo clippy -- -D warnings`: Warnings are treated as errors
+- `cargo fmt -- --check`: Code must be formatted before commit
+- `cargo test`: All tests must pass in CI
+- `cargo build --release`: Release builds must succeed
 
-**Rationale**: Type safety catches bugs at development time, improves IDE support, and serves as living documentation. Consistent code quality reduces cognitive load during code review and maintenance.
+**Rationale:** Automated enforcement prevents quality erosion and ensures
+consistent codebase standards. Manual review cannot catch formatting and
+lint issues as reliably as tooling.
 
 ### II. Test-First Development (NON-NEGOTIABLE)
 
-Test-Driven Development (TDD) is MANDATORY for all features:
+Tests MUST be written before implementation. No feature ships without tests.
 
-- Tests MUST be written before implementation code
-- Tests MUST fail initially (red phase)
-- Implementation proceeds only after tests are failing correctly
-- Red-Green-Refactor cycle is strictly enforced
-- All tests MUST pass before merging: `uv run pytest` returns zero failures
+**Rules:**
+- Write test → Verify test fails → Implement → Verify test passes
+- Unit tests for business logic and utilities
+- Integration tests for MCP protocol handlers and tool interactions
+- Contract tests for external interfaces (stdio transport, tool schemas)
+- Test naming: `test_<function>_<scenario>_<expected_outcome>`
+- Tests must be independently runnable: `cargo test test_name`
 
-**Test Coverage Requirements**:
-- **Unit tests**: Required for all business logic, services, and utilities
-- **Integration tests**: Required for MCP protocol handlers, CLI commands, and external integrations
-- **Contract tests**: Required when defining or modifying MCP protocol interfaces
+**Rationale:** Test-first development catches bugs early, documents behavior,
+and ensures features work as specified. Retrofitting tests after
+implementation often results in tests that match the implementation rather
+than the requirements.
 
-**Rationale**: TDD ensures requirements are testable, reduces debugging time, provides executable specifications, and enables confident refactoring. Tests written first prevent implementation-driven test design that misses edge cases.
+### III. Explicit Over Implicit
 
-### III. Developer Experience Consistency
+Code clarity beats cleverness. Prefer explicit types and error handling.
 
-Developer tooling and workflows MUST be consistent and documented:
+**Rules:**
+- Function signatures MUST use explicit types (no type inference)
+- Function bodies MAY use type inference for local variables
+- Error handling: `Result<T, ErrorData>` for MCP handlers, `.expect()` with
+  descriptive messages for setup code
+- Avoid `unwrap()` except in tests or prototypes
+- Document non-obvious behavior with inline comments
 
-- **Single source of truth**: CLAUDE.md documents all development commands and workflows
-- **Tool standardization**: `uv` for dependencies, `mise` for task automation, `pytest` for testing
-- **Zero configuration drift**: All developers run identical tooling versions via `pyproject.toml` and `mise.toml`
-- **Fast feedback loops**: Local testing MUST complete in under 60 seconds for rapid iteration
-- **Clear error messages**: All validation failures MUST provide actionable fix instructions
+**Rationale:** Rust's type system is a powerful tool for correctness. Explicit
+signatures serve as living documentation and help catch errors at compile
+time. Clear error messages reduce debugging time.
 
-**Onboarding requirement**: A new developer MUST be able to run tests successfully within 5 minutes of cloning the repository using only CLAUDE.md instructions.
+### IV. Developer Experience Consistency
 
-**Rationale**: Consistency eliminates "works on my machine" issues, reduces onboarding friction, and ensures all team members (human or AI) follow identical quality standards.
+Tooling and workflows MUST be consistent across all developer environments.
 
-### IV. Simple, Maintainable Architecture
+**Rules:**
+- Use `mise` for environment management (defined in `mise.toml`)
+- Commands documented in `AGENTS.md` and verified in CI
+- Dev tools: `mise run dev:mcp` (MCP inspector), `mise run dev:page` (docs)
+- Standard project structure: `src/` for source, `tests/` for tests,
+  `website/docs/` for documentation
+- Dependencies locked in `Cargo.lock` (committed to repo)
 
-Simplicity is a core architectural constraint:
+**Rationale:** Inconsistent environments lead to "works on my machine"
+problems. Standardizing on `mise` and documented commands reduces onboarding
+friction and environment-specific bugs.
 
-- **YAGNI principle**: Implement only what is needed now, not what might be needed later
-- **Flat structure**: Minimize abstraction layers - prefer straightforward, readable code over clever patterns
-- **Explicit over implicit**: No magic - all behavior should be traceable through clear function calls
-- **Minimal dependencies**: Every new dependency MUST be justified with a specific use case
-- **No premature optimization**: Optimize only when profiling identifies actual bottlenecks
+### V. Small, Focused Modules
 
-**Complexity justification**: Any abstraction beyond a direct implementation (e.g., repository patterns, factory patterns, custom decorators) MUST document:
-- The specific problem it solves
-- Why a simpler alternative is insufficient
-- The maintenance cost being accepted
+Each module has a single, clear responsibility. Complexity requires
+justification.
 
-**Rationale**: The MCP server is a protocol adapter - its job is clarity and correctness, not architectural sophistication. Simple code is easier to test, debug, and modify.
+**Rules:**
+- Modules: `cli` (command parsing), `mcp` (MCP server logic), `main` (entry)
+- Use `pub(crate)` for internal APIs, `pub` only for public interfaces
+- Group imports: stdlib → external crates → `use crate::`
+- Maximum file length: 500 lines (exceptions require justification in PR)
+- Async runtime: `tokio` with "full" features (declared once in `main.rs`)
 
-### V. Tooling Standardization
+**Rationale:** Small modules are easier to understand, test, and maintain.
+Clear boundaries prevent coupling and make refactoring safer.
 
-All development tools MUST be pinned and version-controlled:
+## Development Standards
 
-- **Python**: 3.13+ specified in `pyproject.toml`
-- **Package manager**: `uv` exclusively - no pip, poetry, or conda
-- **Task runner**: `mise` for all scripted operations (dev, test, lint, format)
-- **Linter**: `ruff` configured in `pyproject.toml`
-- **Type checker**: `pyright` configured in `pyproject.toml`
-- **Testing**: `pytest` with no plugins unless explicitly required
+### Code Style & Conventions
 
-**Lock file discipline**: `uv.lock` MUST be committed and updated atomically with dependency changes.
+**Rust Edition:** 2024
 
-**Rationale**: Tool version inconsistencies cause non-deterministic behavior. Pinning versions ensures reproducible builds and consistent developer experience across environments.
+**Naming:**
+- `snake_case` for functions, variables, modules
+- `PascalCase` for types, structs, enums, traits
+- `SCREAMING_SNAKE_CASE` for constants
 
-## Development Workflow
+**Imports:**
+1. Standard library (`use std::*`)
+2. External crates (`use clap::*`, `use rmcp::*`, `use tokio::*`)
+3. Internal modules (`use crate::cli::*`, `use crate::mcp::*`)
 
-### Code Change Process
+**Formatting:** Enforced by `cargo fmt` (default rustfmt rules)
 
-1. **Branch naming**: Use descriptive names (e.g., `add-prompt-validation`, `fix-mcp-error-handling`)
-2. **Write tests first**: Create failing tests that define the expected behavior
-3. **Implement code**: Make tests pass with minimal sufficient code
-4. **Run quality checks**: Execute `uv run ruff check`, `uv run ruff format`, `uv run pyright`, `uv run pytest`
-5. **Commit atomically**: Each commit should represent a single logical change with all tests passing
-6. **Pull request**: Reference tests that validate the change in PR description
+### Error Handling
 
-### Code Review Standards
+- MCP handlers: Return `Result<T, ErrorData>` (from `rmcp` crate)
+- Setup code: Use `.expect("descriptive message")` for panics
+- Avoid `unwrap()` in production code paths
+- Log errors before returning them to callers
 
-All pull requests MUST:
-- Pass all automated quality gates (linting, type checking, tests)
-- Include tests that validate the changes
-- Update CLAUDE.md if new commands or workflows are introduced
-- Have clear commit messages explaining the "why" not just the "what"
+### Async Patterns
 
-Reviewers MUST verify:
-- Tests were written first (check git history if unclear)
-- No unjustified complexity was added
-- Type annotations are complete and accurate
-- Error handling covers expected failure modes
+- Use `#[tokio::main]` for async entry points
+- Use `async fn` for async functions
+- Prefer structured concurrency (spawn with join handles)
+- Document blocking operations in async contexts
+
+### Visibility
+
+- Default to private (`fn`, `struct`)
+- Use `pub(crate)` for internal APIs
+- Use `pub` only for APIs exposed to external consumers
+- Document all `pub` items with `///` doc comments
+
+### Type Inference
+
+- MUST: Explicit types in function signatures
+- MAY: Type inference in function bodies
+- Document complex type inferences with inline comments
 
 ## Quality Gates
 
-### Pre-Commit Requirements (MUST pass locally)
+### Pre-Commit
 
-```bash
-uv run ruff check      # Zero linting errors
-uv run ruff format     # Code is formatted
-uv run pyright         # Zero type errors
-uv run pytest          # All tests pass
-```
+Developers SHOULD run these locally before committing:
+- `cargo fmt` - Auto-format code
+- `cargo clippy -- -D warnings` - Lint with warnings as errors
+- `cargo test` - Run all tests
 
-### CI/CD Requirements (MUST pass before merge)
+### Continuous Integration
 
-- All pre-commit checks in CI environment
-- Test coverage MUST NOT decrease (tracked via pytest-cov if enabled)
-- No new dependencies without corresponding justification in PR description
+CI MUST enforce these on every push:
+- `cargo fmt -- --check` - Verify formatting
+- `cargo clippy -- -D warnings` - Verify no warnings
+- `cargo test` - Verify all tests pass
+- `cargo build --release` - Verify release build succeeds
 
-### Breaking the Build
+**Failure Mode:** Any gate failure blocks merge. No exceptions.
 
-If main branch is broken (tests failing, type errors, etc.):
-- **Priority 1**: Fix immediately - all other work stops
-- **Communication**: Notify team in commit message and PR
-- **Root cause**: Document what quality gate failed to catch the issue
+### Pre-Release
+
+Before tagging a release:
+- All CI gates MUST pass
+- Documentation MUST be updated (`website/docs/`)
+- `AGENTS.md` MUST reflect current commands and conventions
+- Version MUST be bumped in `Cargo.toml`
 
 ## Governance
 
-This constitution supersedes all informal practices and tribal knowledge. When in doubt, the constitution defines the correct behavior.
+### Amendment Procedure
 
-### Amendment Process
+1. Propose amendment via pull request to `constitution.md`
+2. Document rationale in PR description
+3. Update version number:
+   - MAJOR: Backward-incompatible principle changes (remove/redefine)
+   - MINOR: New principle or materially expanded guidance
+   - PATCH: Clarifications, wording fixes, non-semantic changes
+4. Update Sync Impact Report (HTML comment at top of file)
+5. Propagate changes to dependent templates in `.specify/templates/`
+6. Require approval from project maintainers
+7. Merge only after all affected documentation updated
 
-Constitution changes require:
-1. **Proposal**: Document the specific principle change and rationale
-2. **Impact analysis**: Identify affected templates, workflows, and existing code
-3. **Version bump**: Follow semantic versioning (MAJOR for breaking governance changes, MINOR for new principles, PATCH for clarifications)
-4. **Sync propagation**: Update all dependent templates and documentation before merging
-5. **Team approval**: Constitution changes require explicit review (not auto-merge)
+### Versioning Policy
 
-### Compliance Verification
+This constitution follows semantic versioning:
+- Version format: `MAJOR.MINOR.PATCH`
+- MAJOR: Breaking changes to governance or principles
+- MINOR: New principles or sections added
+- PATCH: Clarifications and refinements
 
-All pull requests MUST verify compliance with this constitution:
-- Test-first discipline followed (check git history)
-- All quality gates passed
-- No unjustified complexity added
-- CLAUDE.md updated if workflows changed
+### Compliance Review
 
-### Runtime Development Guidance
+- All pull requests MUST reference relevant principles
+- Complexity exceptions MUST be justified in PR (see plan-template.md
+  "Complexity Tracking" section)
+- Templates in `.specify/templates/` define how principles are applied to
+  feature planning and task breakdown
+- `AGENTS.md` serves as runtime development guidance for agents and developers
 
-For day-to-day development guidance beyond governance, refer to **CLAUDE.md**. The constitution defines "what" and "why"; CLAUDE.md defines "how".
+### Template Alignment
 
-**Version**: 1.0.0 | **Ratified**: 2025-10-27 | **Last Amended**: 2025-10-27
+- **plan-template.md**: Constitution Check gate validates compliance before
+  Phase 0 research
+- **spec-template.md**: Acceptance scenarios align with test-first principle
+- **tasks-template.md**: Test-first task ordering (tests → implementation)
+- **agent-file-template.md**: Generic template, no constitution-specific
+  constraints
+- **checklist-template.md**: Generic template, no constitution-specific
+  constraints
+
+**Version**: 1.0.0 | **Ratified**: 2025-11-03 | **Last Amended**: 2025-11-03

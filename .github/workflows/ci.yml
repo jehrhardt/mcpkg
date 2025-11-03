@@ -12,19 +12,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          python-version-file: .python-version
-      - name: Install dependencies
-        run: uv sync --frozen
+          components: rustfmt, clippy
       - name: Check formatting
-        run: uv run ruff format --check
+        run: cargo fmt -- --check
       - name: Linting
-        run: uv run ruff check
-      - name: Type check
-        run: uv run pyright
+        run: cargo clippy -- -D warnings
       - name: Run tests
-        run: uv run pytest
+        run: cargo test
