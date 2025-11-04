@@ -23,3 +23,10 @@
 - **MCP server**: Uses `rmcp` crate with stdio transport for Model Context Protocol
 - **CLI**: clap v4 with derive macros for command parsing
 - **Modules**: `cli` (command parsing), `mcp` (MCP server logic), `main` (entry point)
+
+## Active Technologies
+- Rust 2024 edition (001-local-prompts)
+- File system (`.twig/prompts/` directory with Markdown files) (001-local-prompts)
+
+## Recent Changes
+- 001-local-prompts: Added Rust 2024 edition
