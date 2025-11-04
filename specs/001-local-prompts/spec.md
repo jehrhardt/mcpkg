@@ -5,6 +5,16 @@
 **Status**: Draft  
 **Input**: User description: "twig should support local prompts. Local prompts are stored in .twig/prompts within the directory in which the twig MCP server is started. Each prompt is a Markdown file that contains the prompt's content. A prompt has a YAML header (as typically done in Markdown) with the required meta data for a prompt. The prompt is named after the file without the file extension. A prompt can declare parameters, which can be used within the prompt's content using Jinja template syntax. Local prompts are exposed via the list prompts and get prompt messages of the MCP server to allow agents to use them."
 
+## Clarifications
+
+### Session 2025-11-04
+
+- Q: How does the system handle prompt files with the same name in subdirectories? → A: Ignore subdirectories; only scan top-level `.twig/prompts/*.md` files
+- Q: When does Jinja template syntax validation occur? → A: Validate on render (lazy); return error only when client requests the prompt with arguments
+- Q: How should invalid YAML frontmatter be handled at load time? → A: Skip silently at load time; optionally log warnings for debugging
+- Q: Which YAML frontmatter fields are required vs optional? → A: Only `title` and `description` required; `arguments` optional
+- Q: What file watching mechanism should be used for list_changed notifications? → A: Use polling as fallback if native file watching unavailable
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Expose Local Prompts to MCP Clients (Priority: P1)
@@ -50,9 +60,10 @@ Users need clear feedback when their prompt files have errors (invalid YAML, mis
 
 **Acceptance Scenarios**:
 
-1. **Given** a prompt file has invalid YAML frontmatter, **When** the server loads prompts, **Then** that prompt is either skipped or an appropriate error is logged
-2. **Given** a prompt file is missing required metadata fields, **When** an MCP client attempts to retrieve it, **Then** a standard JSON-RPC error is returned
-3. **Given** a prompt uses a parameter in the template but doesn't declare it in frontmatter, **When** the prompt is retrieved without that argument, **Then** the template renders with an empty value or returns a validation error
+1. **Given** a prompt file has invalid YAML frontmatter, **When** the server loads prompts, **Then** that prompt is skipped silently (with optional warning logged for debugging)
+2. **Given** a prompt file is missing required metadata fields (`title` or `description`), **When** the server loads prompts, **Then** that prompt is skipped silently (treated as invalid)
+3. **Given** a prompt contains invalid Jinja template syntax, **When** an MCP client requests that prompt, **Then** a JSON-RPC error is returned indicating template rendering failure
+4. **Given** a prompt uses a parameter in the template but doesn't declare it in frontmatter, **When** the prompt is retrieved without that argument, **Then** the template renders with an empty value or returns a validation error
 
 ---
 
@@ -76,8 +87,8 @@ Users need comprehensive documentation to understand how to create, organize, an
 ### Edge Cases
 
 - What happens when the `.twig/prompts/` directory doesn't exist? (System should handle gracefully, return empty prompt list)
-- How does the system handle prompt files with the same name in subdirectories? (Either support nested paths like "category/prompt-name" or only support flat structure)
-- What happens when a Jinja template contains syntax errors? (Should return error when attempting to render)
+- How does the system handle subdirectories in `.twig/prompts/`? (Subdirectories are ignored; only top-level `.md` files are scanned)
+- What happens when a Jinja template contains syntax errors? (Validation occurs at render time; JSON-RPC error returned to client when prompt is requested)
 - How are files with no `.md` extension handled? (Should be ignored)
 - What happens when a prompt is requested with missing required arguments? (Should return JSON-RPC error -32602)
 - How does the system handle very large prompt files? (Standard file size limits apply)
@@ -87,22 +98,22 @@ Users need comprehensive documentation to understand how to create, organize, an
 
 ### Functional Requirements
 
-- **FR-001**: System MUST scan the `.twig/prompts/` directory (relative to server start location) for Markdown files (.md extension)
-- **FR-002**: System MUST parse YAML frontmatter from each Markdown file to extract prompt metadata
+- **FR-001**: System MUST scan only top-level files in the `.twig/prompts/` directory (relative to server start location) for Markdown files (.md extension), ignoring any subdirectories
+- **FR-002**: System MUST parse YAML frontmatter from each Markdown file to extract prompt metadata; files with invalid YAML or missing required fields (`title`, `description`) are skipped silently (optional warnings may be logged)
 - **FR-003**: System MUST use the filename (without .md extension) as the prompt's unique identifier
 - **FR-004**: System MUST expose discovered prompts via the MCP `prompts/list` endpoint
 - **FR-005**: System MUST support prompt parameters declared in YAML frontmatter
-- **FR-006**: System MUST render prompt content using Jinja template syntax, substituting provided arguments
+- **FR-006**: System MUST render prompt content using Jinja template syntax, substituting provided arguments; template syntax validation occurs at render time (lazy validation)
 - **FR-007**: System MUST return rendered prompts via the MCP `prompts/get` endpoint
 - **FR-008**: System MUST declare the `prompts` capability with `listChanged: true` during MCP initialization
-- **FR-009**: System MUST send `prompts/list_changed` notifications when the prompt directory contents change
+- **FR-009**: System MUST send `prompts/list_changed` notifications when the prompt directory contents change; implementation should use native file system watching with polling fallback for cross-platform compatibility
 - **FR-010**: System MUST validate that required prompt arguments are provided when retrieving a prompt
 - **FR-011**: System MUST return standard JSON-RPC errors for invalid prompt requests (missing arguments, unknown prompts, etc.)
-- **FR-012**: System MUST support standard MCP prompt metadata fields: name, title, description, arguments
+- **FR-012**: System MUST support standard MCP prompt metadata fields: name (derived from filename), title (required in YAML), description (required in YAML), arguments (optional in YAML)
 - **FR-013**: System MUST return prompt messages in the format expected by MCP clients (role, content)
 - **FR-014**: Documentation MUST be added to `website/docs/` directory explaining local prompts feature
 - **FR-015**: Documentation MUST include complete examples of prompt files with YAML frontmatter
-- **FR-016**: Documentation MUST explain the YAML frontmatter structure and required fields
+- **FR-016**: Documentation MUST explain the YAML frontmatter structure, specifying that `title` and `description` are required fields while `arguments` is optional
 - **FR-017**: Documentation MUST demonstrate parameter usage with Jinja template syntax examples
 - **FR-018**: Documentation MUST describe how MCP clients discover and use local prompts
 - **FR-019**: Documentation MUST include troubleshooting guidance for common errors
@@ -110,8 +121,9 @@ Users need comprehensive documentation to understand how to create, organize, an
 ### Key Entities
 
 - **Prompt File**: A Markdown file in `.twig/prompts/` containing YAML frontmatter with metadata and body content with optional Jinja templates
-  - Attributes: filename, title (from YAML), description (from YAML), parameters (from YAML), content body
+  - Attributes: filename, title (from YAML, required), description (from YAML, required), arguments (from YAML, optional), content body
   - Name derived from: filename without .md extension
+  - Validation: Files missing `title` or `description` in YAML frontmatter are skipped as invalid
   
 - **Prompt Parameter**: A declared input variable that can be substituted into the prompt template
   - Attributes: name, description, required flag, default value (optional)
@@ -127,17 +139,17 @@ Users need comprehensive documentation to understand how to create, organize, an
 
 - **SC-001**: MCP clients can discover all valid prompt files in `.twig/prompts/` within 100ms of server startup
 - **SC-002**: Prompt templates with parameters render correctly with argument substitution in under 50ms
-- **SC-003**: Changes to the prompts directory are detected and clients notified within 2 seconds
+- **SC-003**: Changes to the prompts directory are detected and clients notified within 2 seconds (using native file watching or polling fallback)
 - **SC-004**: Users can create and use a functional parameterized prompt end-to-end in under 5 minutes by following the documentation
 - **SC-005**: System handles at least 100 prompt files without performance degradation
-- **SC-006**: Invalid prompt files are gracefully skipped without affecting valid prompts
+- **SC-006**: Invalid prompt files (malformed YAML) are gracefully skipped at load time without affecting valid prompts or blocking server startup
 - **SC-007**: Documentation enables 90% of users to successfully create their first local prompt without additional support
 
 ## Assumptions
 
 - Users are familiar with Markdown and YAML frontmatter format
 - Users understand basic Jinja template syntax for parameter substitution
-- The `.twig/prompts/` directory structure is flat (no nested subdirectories) unless otherwise specified
+- The `.twig/prompts/` directory structure is flat (no nested subdirectories); subdirectories are ignored
 - Prompt files use UTF-8 encoding
 - The MCP server has read access to the `.twig/prompts/` directory
-- File system watching (for list_changed notifications) is available on the target platform
+- File system watching uses native mechanisms with polling fallback to ensure cross-platform compatibility

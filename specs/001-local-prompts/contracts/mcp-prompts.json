@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MCP Prompts Protocol Contracts",
+  "description": "JSON-RPC 2.0 contracts for MCP prompts endpoints implemented by Twig server",
+  "version": "1.0.0",
+  "contracts": {
+    "initialize": {
+      "description": "Server capability declaration during MCP initialization handshake",
+      "method": "initialize",
+      "direction": "client → server",
+      "response": {
+        "capabilities": {
+          "prompts": {
+            "listChanged": true
+          }
+        }
+      },
+      "example_response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "protocolVersion": "2024-11-05",
+          "capabilities": {
+            "prompts": {
+              "listChanged": true
+            }
+          },
+          "serverInfo": {
+            "name": "twig",
+            "version": "0.1.0"
+          }
+        }
+      }
+    },
+    "prompts/list": {
+      "description": "List all available prompts from .twig/prompts/ directory",
+      "method": "prompts/list",
+      "direction": "client → server",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "prompts/list",
+        "params": {
+          "cursor": {
+            "type": "string",
+            "description": "Optional pagination cursor from previous response",
+            "required": false
+          }
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "prompts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Prompt identifier (filename without .md extension)"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Optional description from YAML frontmatter",
+                  "required": false
+                },
+                "arguments": {
+                  "type": "array",
+                  "description": "Optional list of parameters this prompt accepts",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Parameter name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Parameter description",
+                        "required": false
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "description": "Whether parameter is required"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "required"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Cursor for next page (null if no more pages)",
+            "required": false
+          }
+        }
+      },
+      "example_request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "prompts/list",
+        "params": {}
+      },
+      "example_response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "prompts": [
+            {
+              "name": "code-review",
+              "description": "Reviews code with customizable focus areas",
+              "arguments": [
+                {
+                  "name": "language",
+                  "description": "Programming language of the code",
+                  "required": true
+                },
+                {
+                  "name": "focus",
+                  "description": "Review focus area (security, performance, style)",
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "explain-code",
+              "description": "Explains code snippets in plain language",
+              "arguments": [
+                {
+                  "name": "level",
+                  "description": "Explanation detail level (beginner, intermediate, expert)",
+                  "required": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "error_cases": [
+        {
+          "code": -32603,
+          "message": "Internal error",
+          "description": "Failed to read prompts directory or parse prompt files"
+        }
+      ],
+      "requirements": [
+        "FR-004: System MUST expose discovered prompts via the MCP prompts/list endpoint",
+        "FR-008: System MUST declare the prompts capability with listChanged: true"
+      ]
+    },
+    "prompts/get": {
+      "description": "Get a specific prompt with arguments, returns rendered content",
+      "method": "prompts/get",
+      "direction": "client → server",
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "prompts/get",
+        "params": {
+          "name": {
+            "type": "string",
+            "description": "Prompt identifier",
+            "required": true
+          },
+          "arguments": {
+            "type": "object",
+            "description": "Key-value map of parameter values",
+            "required": false,
+            "additionalProperties": true
+          }
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "description": {
+            "type": "string",
+            "description": "Optional prompt description",
+            "required": false
+          },
+          "messages": {
+            "type": "array",
+            "description": "List of messages (typically one User role message)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "assistant"
+                  ],
+                  "description": "Message role"
+                },
+                "content": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "text"
+                      ]
+                    },
+                    "text": {
+                      "type": "string",
+                      "description": "Rendered prompt content (after Jinja substitution)"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "text"
+                  ]
+                }
+              },
+              "required": [
+                "role",
+                "content"
+              ]
+            }
+          }
+        }
+      },
+      "example_request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "prompts/get",
+        "params": {
+          "name": "code-review",
+          "arguments": {
+            "language": "Python",
+            "focus": "security"
+          }
+        }
+      },
+      "example_response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "description": "Reviews code with customizable focus areas",
+          "messages": [
+            {
+              "role": "user",
+              "content": {
+                "type": "text",
+                "text": "Please review the following Python code with a focus on security:\n\n[Code will be provided by the user]\n\nProvide detailed feedback on:\n- Potential security vulnerabilities\n- Best practices violations\n- Recommendations for improvement"
+              }
+            }
+          ]
+        }
+      },
+      "error_cases": [
+        {
+          "code": -32602,
+          "message": "Invalid params",
+          "description": "Prompt not found or missing required arguments",
+          "example": {
+            "jsonrpc": "2.0",
+            "id": 3,
+            "error": {
+              "code": -32602,
+              "message": "Prompt 'unknown-prompt' not found"
+            }
+          }
+        },
+        {
+          "code": -32602,
+          "message": "Invalid params",
+          "description": "Missing required argument",
+          "example": {
+            "jsonrpc": "2.0",
+            "id": 3,
+            "error": {
+              "code": -32602,
+              "message": "Missing required argument: language"
+            }
+          }
+        },
+        {
+          "code": -32603,
+          "message": "Internal error",
+          "description": "Template rendering failed (Jinja syntax error)",
+          "example": {
+            "jsonrpc": "2.0",
+            "id": 3,
+            "error": {
+              "code": -32603,
+              "message": "Template rendering failed: undefined variable 'unknown_var'"
+            }
+          }
+        }
+      ],
+      "requirements": [
+        "FR-006: System MUST render prompt content using Jinja template syntax",
+        "FR-007: System MUST return rendered prompts via the MCP prompts/get endpoint",
+        "FR-010: System MUST validate that required prompt arguments are provided",
+        "FR-011: System MUST return standard JSON-RPC errors for invalid requests"
+      ]
+    },
+    "notifications/prompts/list_changed": {
+      "description": "Notification sent when prompt directory contents change",
+      "method": "notifications/prompts/list_changed",
+      "direction": "server → client",
+      "notification": {
+        "jsonrpc": "2.0",
+        "method": "notifications/prompts/list_changed",
+        "params": {}
+      },
+      "example_notification": {
+        "jsonrpc": "2.0",
+        "method": "notifications/prompts/list_changed"
+      },
+      "triggers": [
+        "New prompt file added to .twig/prompts/",
+        "Existing prompt file modified",
+        "Prompt file deleted from .twig/prompts/"
+      ],
+      "requirements": [
+        "FR-009: System MUST send prompts/list_changed notifications when directory contents change",
+        "SC-003: Changes detected and clients notified within 2 seconds"
+      ],
+      "client_behavior": "Client should call prompts/list to refresh prompt list"
+    }
+  },
+  "implementation_notes": {
+    "pagination": "For <100 prompts, pagination is optional. Return all prompts with null nextCursor.",
+    "file_watching": "Use notify + notify-debouncer-full with 2-second debounce timeout",
+    "template_errors": "Jinja syntax errors in templates should be caught at add_template time, not render time",
+    "thread_safety": "All operations must be thread-safe for concurrent client requests",
+    "performance_targets": {
+      "prompts_list": "<100ms (SC-001)",
+      "prompts_get": "<50ms for template rendering (SC-002)",
+      "notification_delay": "<2s from file change to notification (SC-003)"
+    }
+  },
+  "test_scenarios": [
+    {
+      "scenario": "List prompts with no prompts directory",
+      "setup": ".twig/prompts/ directory does not exist",
+      "request": "prompts/list",
+      "expected": "Empty prompts array, no error"
+    },
+    {
+      "scenario": "Get prompt with missing required argument",
+      "setup": "Prompt 'code-review' has required argument 'language'",
+      "request": "prompts/get with name='code-review', arguments={}",
+      "expected": "Error -32602: Missing required argument: language"
+    },
+    {
+      "scenario": "Get prompt with Jinja syntax error",
+      "setup": "Prompt file contains '{{ unclosed'",
+      "request": "prompts/get with valid arguments",
+      "expected": "Error -32603: Template rendering failed"
+    },
+    {
+      "scenario": "Prompt file added while server running",
+      "setup": "Server running with 1 prompt",
+      "action": "Add new-prompt.md to directory",
+      "expected": "notifications/prompts/list_changed sent within 2s"
+    },
+    {
+      "scenario": "Prompt file with invalid YAML",
+      "setup": "Prompt file has malformed YAML frontmatter",
+      "expected": "File skipped, logged but not exposed via prompts/list"
+    }
+  ]
+}

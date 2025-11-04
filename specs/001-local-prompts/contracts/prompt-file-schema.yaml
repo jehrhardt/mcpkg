@@ -1,0 +1,245 @@
+# Prompt File Format Schema
+# Version: 1.0.0
+# Description: YAML frontmatter schema for .twig/prompts/*.md files
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Twig Prompt File
+description: |
+  A Twig prompt file is a Markdown document with YAML frontmatter.
+  The file must have a .md extension and be located in .twig/prompts/ directory.
+  The prompt name is derived from the filename (without .md extension).
+
+type: object
+properties:
+  # YAML Frontmatter Schema
+  frontmatter:
+    type: object
+    properties:
+      title:
+        type: string
+        description: |
+          Optional display title for the prompt.
+          If not provided, defaults to titlecase of filename.
+        maxLength: 100
+        examples:
+          - "Code Review Assistant"
+          - "Explain Complex Code"
+
+      description:
+        type: string
+        description: |
+          Optional description of what the prompt does.
+          Shown to users when browsing prompts.
+        maxLength: 500
+        examples:
+          - "Reviews code with customizable focus areas"
+          - "Explains code snippets in plain language"
+
+      arguments:
+        type: array
+        description: |
+          Optional list of parameters this prompt accepts.
+          Parameters can be used in the content via Jinja syntax: {{ parameter_name }}
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: |
+                Parameter name. Must be valid Jinja variable name:
+                - Alphanumeric and underscore only
+                - Cannot start with a digit
+                - Case sensitive
+              pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+              examples:
+                - "language"
+                - "focus_area"
+                - "detail_level"
+
+            description:
+              type: string
+              description: |
+                Optional human-readable description of the parameter.
+                Helps users understand what value to provide.
+              examples:
+                - "Programming language of the code"
+                - "Review focus area (security, performance, style)"
+
+            required:
+              type: boolean
+              description: |
+                Whether this parameter must be provided.
+                Defaults to false if not specified.
+              default: false
+
+          required:
+            - name
+
+  # Content Body Schema
+  content:
+    type: string
+    description: |
+      Markdown content body (after YAML frontmatter).
+      Can use Jinja template syntax for parameter substitution.
+      
+      Supported Jinja features:
+      - Variable substitution: {{ variable_name }}
+      - Filters: {{ variable_name | upper }}
+      - Conditionals: {% if condition %} ... {% endif %}
+      - Loops: {% for item in items %} ... {% endfor %}
+    examples:
+      - |
+        Please review the following {{ language }} code with a focus on {{ focus }}:
+        
+        [Code will be provided by the user]
+        
+        {% if focus == "security" %}
+        Pay special attention to:
+        - Input validation
+        - SQL injection risks
+        - XSS vulnerabilities
+        {% endif %}
+
+# Complete Example Files
+
+examples:
+  - name: code-review.md
+    description: Prompt for code review with language and focus parameters
+    file: |
+      ---
+      title: Code Review Assistant
+      description: Reviews code with customizable focus areas
+      arguments:
+        - name: language
+          description: Programming language of the code
+          required: true
+        - name: focus
+          description: Review focus area (security, performance, style)
+          required: false
+      ---
+      Please review the following {{ language }} code{% if focus %} with a focus on {{ focus }}{% endif %}:
+      
+      [Code will be provided by the user]
+      
+      Provide detailed feedback on:
+      {% if focus == "security" %}
+      - Potential security vulnerabilities
+      - Input validation issues
+      - Authentication/authorization concerns
+      {% elif focus == "performance" %}
+      - Performance bottlenecks
+      - Algorithmic complexity
+      - Resource usage optimization
+      {% else %}
+      - Code structure and organization
+      - Best practices adherence
+      - Potential bugs or issues
+      {% endif %}
+
+  - name: explain-code.md
+    description: Simple prompt with optional parameter
+    file: |
+      ---
+      title: Explain Code
+      description: Explains code snippets in plain language
+      arguments:
+        - name: level
+          description: Explanation detail level (beginner, intermediate, expert)
+          required: false
+      ---
+      Please explain the following code snippet in clear, plain language.
+      
+      {% if level %}
+      Target audience: {{ level }} developers
+      {% endif %}
+      
+      [Code will be provided by the user]
+
+  - name: simple-prompt.md
+    description: Minimal prompt with no parameters
+    file: |
+      ---
+      title: Greet User
+      description: A simple greeting prompt
+      ---
+      Hello! How can I help you today?
+
+# Validation Rules
+
+validation_rules:
+  file_name:
+    - Must end with .md extension
+    - Must be valid filename (no path separators)
+    - Recommended: lowercase, alphanumeric, dashes/underscores
+    - Examples: code-review.md, explain_code.md
+
+  frontmatter:
+    - Must be valid YAML
+    - Must be enclosed between --- delimiters at start of file
+    - All fields are optional
+    - Unknown fields are ignored (forward compatibility)
+
+  arguments:
+    - Parameter names must be unique within a prompt
+    - Parameter names must be valid Jinja identifiers
+    - Required parameters must be validated on prompts/get
+
+  content:
+    - Must be UTF-8 encoded
+    - Jinja syntax errors are caught at server startup or file modification
+    - Invalid templates are logged but don't crash the server
+
+  encoding:
+    - UTF-8 required
+    - BOM optional but not recommended
+
+# Error Handling
+
+error_cases:
+  invalid_yaml:
+    description: YAML frontmatter cannot be parsed
+    behavior: Skip file, log error, continue loading other prompts
+    log_level: WARN
+    example_log: "Skipping code-review.md: invalid YAML frontmatter"
+
+  missing_frontmatter:
+    description: File has no YAML frontmatter (no --- delimiters)
+    behavior: Treat as prompt with empty metadata (no title, description, arguments)
+    log_level: INFO
+
+  invalid_jinja:
+    description: Content contains invalid Jinja template syntax
+    behavior: Skip file, log error, continue loading other prompts
+    log_level: ERROR
+    example_log: "Skipping template.md: Jinja syntax error at line 5"
+
+  duplicate_argument_names:
+    description: Multiple arguments with the same name
+    behavior: Use first occurrence, log warning
+    log_level: WARN
+
+  invalid_argument_name:
+    description: Argument name is not valid Jinja identifier
+    behavior: Skip file, log error
+    log_level: ERROR
+    example_log: "Invalid argument name '2fast' in fast-review.md"
+
+# File System Conventions
+
+file_system:
+  location: ".twig/prompts/"
+  relative_to: "Directory where MCP server was started"
+  structure: "Flat (no subdirectories)"
+  watch_mode: "Recursive=false (single directory only)"
+  encoding: "UTF-8"
+  line_endings: "LF or CRLF (normalized by parser)"
+
+# Requirements Mapping
+
+requirements_coverage:
+  FR-001: "File discovery in .twig/prompts/ directory"
+  FR-002: "YAML frontmatter parsing"
+  FR-003: "Prompt name derived from filename"
+  FR-005: "Parameter declarations in YAML arguments field"
+  FR-006: "Jinja template syntax in content body"
+  FR-012: "MCP prompt metadata fields (name, title, description, arguments)"
