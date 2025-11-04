@@ -62,28 +62,17 @@ Parsed YAML frontmatter from the prompt file.
 ```rust
 #[derive(Debug, Deserialize)]
 pub(crate) struct PromptMetadata {
-    /// Optional title (display name)
-    /// If not provided, defaults to titlecase of name
-    #[serde(default)]
-    pub title: Option<String>,
+    /// Required title (display name)
+    /// Must be present in YAML frontmatter
+    pub title: String,
     
-    /// Optional description of what the prompt does
-    #[serde(default)]
-    pub description: Option<String>,
+    /// Required description of what the prompt does
+    /// Must be present in YAML frontmatter
+    pub description: String,
     
     /// List of parameters this prompt accepts
     #[serde(default)]
     pub arguments: Vec<PromptArgument>,
-}
-
-impl Default for PromptMetadata {
-    fn default() -> Self {
-        Self {
-            title: None,
-            description: None,
-            arguments: Vec::new(),
-        }
-    }
 }
 ```
 
@@ -105,9 +94,11 @@ arguments:
 
 ### Validation Rules
 
-- **title**: Optional, string, max 100 chars recommended
-- **description**: Optional, string, max 500 chars recommended
+- **title**: Required, string, max 100 chars recommended
+- **description**: Required, string, max 500 chars recommended
 - **arguments**: Optional array, each entry must be valid PromptArgument
+
+**Validation Logic**: Files missing `title` or `description` in YAML frontmatter MUST be skipped during load_all() (see FR-002).
 
 ---
 

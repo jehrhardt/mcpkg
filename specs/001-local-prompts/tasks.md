@@ -8,6 +8,8 @@
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+**Total Tasks**: 80 (T001-T080)
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
@@ -178,6 +180,8 @@ Single project structure at repository root:
 - [ ] T070 [P] Verify SC-001: prompt discovery completes within 100ms of server startup
 - [ ] T071 [P] Verify SC-002: template rendering completes within 50ms
 - [ ] T072 [P] Verify SC-003: file changes detected and notified within 2 seconds
+- [ ] T079 [P] Verify SC-004: Time end-to-end prompt creation following quickstart.md with stopwatch (target: user completes first parameterized prompt in <5 minutes from reading docs to successful prompts/get call)
+- [ ] T080 [P] Verify SC-007: Conduct usability test with 10 representative users (ideally unfamiliar with Twig), measure success rate creating first prompt using only documentation (target: ≥9/10 succeed without support)
 - [ ] T073 Run cargo fmt to format all code
 - [ ] T074 Run cargo clippy -- -D warnings to verify no linting errors
 - [ ] T075 Run cargo test to verify all tests pass
@@ -300,3 +304,47 @@ With 2+ developers after Foundational phase:
 - Verify tests fail before implementing features
 - Commit after each task or logical group of tasks
 - Stop at any checkpoint to validate story independently
+
+---
+
+## Requirements Coverage Matrix
+
+This matrix maps functional requirements (FR) and success criteria (SC) from spec.md to implementing tasks.
+
+### Functional Requirements Coverage
+
+| Requirement | Description | Implementing Tasks |
+|-------------|-------------|--------------------|
+| FR-001 | Scan top-level .md files only | T021 (parse), T025 (load_all) |
+| FR-002 | Parse YAML frontmatter, skip invalid | T021 (parse), T053 (validate), T054 (log skip) |
+| FR-003 | Filename → prompt name | T021 (parse logic) |
+| FR-004 | Expose prompts/list endpoint | T031 (list_prompts handler) |
+| FR-005 | Support parameters in YAML | T021 (parse arguments field) |
+| FR-006 | Render with Jinja, lazy validation | T022 (TemplateRenderer), T023 (render method), T028 (registry render) |
+| FR-007 | Return rendered via prompts/get | T032 (get_prompt handler) |
+| FR-008 | Declare prompts capability | T030 (get_info with capability) |
+| FR-009 | Send list_changed notifications | T038-T044 (file watching + notification) |
+| FR-010 | Validate required arguments | T028 (validate in render), T056 (add validation) |
+| FR-011 | Return JSON-RPC errors | T009 (ErrorData conversion), T057 (update error mapping) |
+| FR-012 | Support MCP metadata fields | T031 (convert to MCP Prompt structs) |
+| FR-013 | Return messages with role/content | T032 (GetPromptResult with User role) |
+| FR-014 | Add documentation to website/docs/ | T058 (create local-prompts.md) |
+| FR-015 | Include YAML examples | T061 (complete examples) |
+| FR-016 | Explain YAML structure + required fields | T060 (document frontmatter structure) |
+| FR-017 | Demonstrate Jinja + parameters | T062 (Jinja syntax), T063 (parameter usage) |
+| FR-018 | Describe MCP client discovery | T064 (MCP integration section) |
+| FR-019 | Include troubleshooting | T065 (troubleshooting section) |
+
+### Success Criteria Coverage
+
+| Criterion | Description | Validating Tasks |
+|-----------|-------------|------------------|
+| SC-001 | Discover prompts <100ms | T070 (verify startup time) |
+| SC-002 | Render <50ms | T071 (verify render time) |
+| SC-003 | Notify <2s on change | T072 (verify notification timing) |
+| SC-004 | User creates prompt <5min | T079 (time end-to-end creation) |
+| SC-005 | Handle 100+ files | T069 (performance test) |
+| SC-006 | Skip invalid files gracefully | T050, T051 (integration tests), T054 (logging) |
+| SC-007 | 90% user success with docs | T080 (usability test) |
+
+**Note**: Tasks T079 and T080 are additions to validate user-facing success criteria that require human testing.

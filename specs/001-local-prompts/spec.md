@@ -19,7 +19,7 @@
 
 ### User Story 1 - Expose Local Prompts to MCP Clients (Priority: P1)
 
-Users want to create reusable prompt templates that MCP clients (like AI assistants) can discover and use. These templates should support parameters to make them flexible for different contexts.
+Users want to create reusable prompt templates that MCP clients (like AI assistants) can discover and use. These templates should support parameters to make them flexible for different contexts (minimum: support unlimited parameters of type string with Jinja template substitution, conditionals, and filters per minijinja capabilities).
 
 **Why this priority**: This is the core value proposition - enabling users to define and share custom prompts with AI agents. Without this, the feature provides no value.
 
@@ -31,6 +31,7 @@ Users want to create reusable prompt templates that MCP clients (like AI assista
 2. **Given** a prompt defines a parameter `language` in its YAML frontmatter, **When** an MCP client sends `prompts/get` with `arguments: {language: "Python"}`, **Then** the server returns the rendered prompt with "Python" substituted in the template
 3. **Given** multiple prompt files exist in `.twig/prompts/`, **When** an MCP client requests the prompt list, **Then** all valid prompts are returned with their correct names (filename without extension)
 4. **Given** a prompt uses Jinja template syntax like `{{ parameter_name }}`, **When** the prompt is retrieved with matching arguments, **Then** the template is rendered with the provided values
+5. **Given** a prompt uses advanced Jinja features (conditionals `{% if %}`, filters `{{ var | upper }}`), **When** an MCP client retrieves the prompt with appropriate arguments, **Then** the template renders correctly demonstrating flexibility across different contexts
 
 ---
 
@@ -126,8 +127,9 @@ Users need comprehensive documentation to understand how to create, organize, an
   - Validation: Files missing `title` or `description` in YAML frontmatter are skipped as invalid
   
 - **Prompt Parameter**: A declared input variable that can be substituted into the prompt template
-  - Attributes: name, description, required flag, default value (optional)
+  - Attributes: name, description, required flag
   - Used in: Jinja template expressions within prompt content
+  - Note: Default values are not supported in MVP; optional parameters with no argument provided render as empty string per minijinja behavior
 
 - **Documentation Page**: User-facing documentation in `website/docs/` directory
   - Content: Feature overview, setup instructions, YAML structure reference, Jinja template examples, troubleshooting guide
