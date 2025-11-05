@@ -22,6 +22,23 @@ pub(crate) struct PromptFile {
     pub modified: SystemTime,
 }
 
+/// Lightweight metadata-only representation for registry storage
+#[derive(Debug, Clone)]
+#[allow(dead_code)] // Used internally by registry
+pub(crate) struct PromptInfo {
+    /// Unique identifier derived from filename (without .md extension)
+    pub name: String,
+
+    /// Absolute path to the file
+    pub path: PathBuf,
+
+    /// Parsed metadata from YAML frontmatter
+    pub metadata: PromptMetadata,
+
+    /// File modification timestamp (for change detection)
+    pub modified: SystemTime,
+}
+
 /// Parsed YAML frontmatter from the prompt file
 #[derive(Debug, Clone, Deserialize, Default)]
 #[allow(dead_code)] // Deserialized from YAML frontmatter

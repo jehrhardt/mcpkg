@@ -8,4 +8,4 @@ pub(crate) mod watcher;
 #[allow(unused_imports)] // Used by MCP server in binary
 pub(crate) use registry::PromptRegistry;
 #[allow(unused_imports)] // Some types used only in tests
-pub(crate) use types::{PromptArgument, PromptError, PromptFile, PromptMetadata};
+pub(crate) use types::{PromptArgument, PromptError, PromptFile, PromptInfo, PromptMetadata};
