@@ -12,7 +12,24 @@ wheels/
 # Dev environment variables
 .env
 
-
-# Added by cargo
-
+# Rust/Cargo
 /target
+debug/
+release/
+*.rs.bk
+*.rlib
+*.prof*
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -29,10 +29,10 @@ Single project structure at repository root:
 
 **Purpose**: Project initialization and dependency setup
 
-- [ ] T001 Add dependencies to Cargo.toml: gray_matter 0.3, minijinja 2.12.0, notify 8.2, notify-debouncer-full 0.6, thiserror 1.0
-- [ ] T002 [P] Create prompts module structure: src/prompts/mod.rs, src/prompts/types.rs, src/prompts/parser.rs, src/prompts/renderer.rs, src/prompts/registry.rs, src/prompts/watcher.rs
-- [ ] T003 [P] Create integration test structure: tests/integration/mod.rs, tests/integration/prompts_list.rs, tests/integration/prompts_get.rs, tests/integration/prompts_notify.rs
-- [ ] T004 Declare prompts module in src/main.rs
+- [X] T001 Add dependencies to Cargo.toml: gray_matter 0.3, minijinja 2.12.0, notify 8.2, notify-debouncer-full 0.6, thiserror 1.0
+- [X] T002 [P] Create prompts module structure: src/prompts/mod.rs, src/prompts/types.rs, src/prompts/parser.rs, src/prompts/renderer.rs, src/prompts/registry.rs, src/prompts/watcher.rs
+- [X] T003 [P] Create integration test structure: tests/integration/mod.rs, tests/integration/prompts_list.rs, tests/integration/prompts_get.rs, tests/integration/prompts_notify.rs
+- [X] T004 Declare prompts module in src/main.rs
 
 ---
 
@@ -42,13 +42,13 @@ Single project structure at repository root:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Define PromptFile struct in src/prompts/types.rs (name, path, metadata, content, modified)
-- [ ] T006 [P] Define PromptMetadata struct in src/prompts/types.rs (title, description, arguments with serde defaults)
-- [ ] T007 [P] Define PromptArgument struct in src/prompts/types.rs (name, description, required)
-- [ ] T008 [P] Define PromptError enum in src/prompts/types.rs with thiserror (NotFound, InvalidFrontmatter, InvalidTemplate, MissingArgument, RenderError, IoError, WatcherError)
-- [ ] T009 Implement From<PromptError> for rmcp::ErrorData in src/prompts/types.rs (map NotFound and MissingArgument to invalid_params, others to internal_error)
-- [ ] T010 Implement From<PromptArgument> for rmcp::model::PromptArgument in src/prompts/types.rs
-- [ ] T011 Export public API in src/prompts/mod.rs (PromptRegistry and necessary types)
+- [X] T005 [P] Define PromptFile struct in src/prompts/types.rs (name, path, metadata, content, modified)
+- [X] T006 [P] Define PromptMetadata struct in src/prompts/types.rs (title, description, arguments with serde defaults)
+- [X] T007 [P] Define PromptArgument struct in src/prompts/types.rs (name, description, required)
+- [X] T008 [P] Define PromptError enum in src/prompts/types.rs with thiserror (NotFound, InvalidFrontmatter, InvalidTemplate, MissingArgument, RenderError, IoError, WatcherError)
+- [X] T009 Implement From<PromptError> for rmcp::ErrorData in src/prompts/types.rs (map NotFound and MissingArgument to invalid_params, others to internal_error)
+- [X] T010 Implement From<PromptArgument> for rmcp::model::PromptArgument in src/prompts/types.rs
+- [X] T011 Export public API in src/prompts/mod.rs (PromptRegistry and necessary types)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -62,30 +62,30 @@ Single project structure at repository root:
 
 ### Tests for User Story 1 (Write FIRST, ensure they FAIL)
 
-- [ ] T012 [P] [US1] Unit test for parse_prompt_file with valid YAML frontmatter in src/prompts/parser.rs tests module
-- [ ] T013 [P] [US1] Unit test for parse_prompt_file with missing required fields (title or description) in src/prompts/parser.rs tests module
-- [ ] T014 [P] [US1] Unit test for TemplateRenderer with simple variable substitution in src/prompts/renderer.rs tests module
-- [ ] T015 [P] [US1] Unit test for TemplateRenderer with missing variables in src/prompts/renderer.rs tests module
-- [ ] T016 [P] [US1] Integration test for prompts/list returning empty array when .twig/prompts/ doesn't exist in tests/integration/prompts_list.rs
-- [ ] T017 [P] [US1] Integration test for prompts/list returning multiple prompts with correct names and metadata in tests/integration/prompts_list.rs
-- [ ] T018 [P] [US1] Integration test for prompts/get with parameter substitution in tests/integration/prompts_get.rs
-- [ ] T019 [P] [US1] Integration test for prompts/get returning error for unknown prompt in tests/integration/prompts_get.rs
-- [ ] T020 [P] [US1] Integration test for prompts/get returning error for missing required argument in tests/integration/prompts_get.rs
+- [X] T012 [P] [US1] Unit test for parse_prompt_file with valid YAML frontmatter in src/prompts/parser.rs tests module
+- [X] T013 [P] [US1] Unit test for parse_prompt_file with missing required fields (title or description) in src/prompts/parser.rs tests module
+- [X] T014 [P] [US1] Unit test for TemplateRenderer with simple variable substitution in src/prompts/renderer.rs tests module
+- [X] T015 [P] [US1] Unit test for TemplateRenderer with missing variables in src/prompts/renderer.rs tests module
+- [X] T016 [P] [US1] Integration test for prompts/list returning empty array when .twig/prompts/ doesn't exist in tests/integration/prompts_list.rs
+- [X] T017 [P] [US1] Integration test for prompts/list returning multiple prompts with correct names and metadata in tests/integration/prompts_list.rs
+- [X] T018 [P] [US1] Integration test for prompts/get with parameter substitution in tests/integration/prompts_get.rs
+- [X] T019 [P] [US1] Integration test for prompts/get returning error for unknown prompt in tests/integration/prompts_get.rs
+- [X] T020 [P] [US1] Integration test for prompts/get returning error for missing required argument in tests/integration/prompts_get.rs
 
 ### Implementation for User Story 1
 
-- [ ] T021 [P] [US1] Implement parse_prompt_file function in src/prompts/parser.rs (read file, extract name from filename, parse YAML frontmatter with gray_matter, validate required fields)
-- [ ] T022 [P] [US1] Implement TemplateRenderer struct with new() in src/prompts/renderer.rs (wrap minijinja::Environment)
-- [ ] T023 [US1] Implement TemplateRenderer::render method in src/prompts/renderer.rs (add template, get template, render with arguments, handle errors)
-- [ ] T024 [US1] Implement PromptRegistry struct with new() in src/prompts/registry.rs (Arc<RwLock<HashMap>>, directory PathBuf, TemplateRenderer)
-- [ ] T025 [US1] Implement PromptRegistry::load_all method in src/prompts/registry.rs (handle missing directory, scan for .md files, parse prompts, skip invalid files with logging)
-- [ ] T026 [US1] Implement PromptRegistry::get method in src/prompts/registry.rs (read lock, return cloned PromptFile)
-- [ ] T027 [US1] Implement PromptRegistry::list method in src/prompts/registry.rs (read lock, return all prompts)
-- [ ] T028 [US1] Implement PromptRegistry::render method in src/prompts/registry.rs (get prompt, validate required arguments, call renderer)
-- [ ] T029 [US1] Update src/mcp.rs to create PromptRegistry in Server::new (use .twig/prompts relative to current directory, call load_all)
-- [ ] T030 [US1] Update src/mcp.rs ServerHandler::get_info to declare prompts capability with listChanged: true
-- [ ] T031 [US1] Implement src/mcp.rs ServerHandler::list_prompts (call registry.list, convert to MCP Prompt structs)
-- [ ] T032 [US1] Implement src/mcp.rs ServerHandler::get_prompt (extract arguments, call registry.render, return GetPromptResult with User role message)
+- [X] T021 [P] [US1] Implement parse_prompt_file function in src/prompts/parser.rs (read file, extract name from filename, parse YAML frontmatter with gray_matter, validate required fields)
+- [X] T022 [P] [US1] Implement TemplateRenderer struct with new() in src/prompts/renderer.rs (wrap minijinja::Environment)
+- [X] T023 [US1] Implement TemplateRenderer::render method in src/prompts/renderer.rs (add template, get template, render with arguments, handle errors)
+- [X] T024 [US1] Implement PromptRegistry struct with new() in src/prompts/registry.rs (Arc<RwLock<HashMap>>, directory PathBuf, TemplateRenderer)
+- [X] T025 [US1] Implement PromptRegistry::load_all method in src/prompts/registry.rs (handle missing directory, scan for .md files, parse prompts, skip invalid files with logging)
+- [X] T026 [US1] Implement PromptRegistry::get method in src/prompts/registry.rs (read lock, return cloned PromptFile)
+- [X] T027 [US1] Implement PromptRegistry::list method in src/prompts/registry.rs (read lock, return all prompts)
+- [X] T028 [US1] Implement PromptRegistry::render method in src/prompts/registry.rs (get prompt, validate required arguments, call renderer)
+- [X] T029 [US1] Update src/mcp.rs to create PromptRegistry in Server::new (use .twig/prompts relative to current directory, call load_all)
+- [X] T030 [US1] Update src/mcp.rs ServerHandler::get_info to declare prompts capability with listChanged: true
+- [X] T031 [US1] Implement src/mcp.rs ServerHandler::list_prompts (call registry.list, convert to MCP Prompt structs)
+- [X] T032 [US1] Implement src/mcp.rs ServerHandler::get_prompt (extract arguments, call registry.render, return GetPromptResult with User role message)
 
 **Checkpoint**: User Story 1 complete - clients can list and retrieve prompts with parameter substitution
 
