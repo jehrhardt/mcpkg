@@ -1,6 +1,4 @@
-mod cli;
-mod mcp;
-mod prompts;
+use twig::cli;
 
 #[tokio::main]
 async fn main() {

@@ -14,7 +14,7 @@ enum Commands {
     Start,
 }
 
-pub(crate) async fn run() {
+pub async fn run() {
     let cli = Cli::parse();
 
     if let Some(command) = cli.command {
