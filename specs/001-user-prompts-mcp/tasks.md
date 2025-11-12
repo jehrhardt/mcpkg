@@ -27,10 +27,10 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project structure per implementation plan in src/
-- [ ] T002 Add Rust dependencies to Cargo.toml: rmcp, minijinja, dirs, toml, tokio
+- [X] T001 Create project structure per implementation plan in src/
+- [X] T002 Add Rust dependencies to Cargo.toml: rmcp, minijinja, dirs, toml, tokio
 - [ ] T003 [P] Configure cargo clippy and cargo fmt in CI workflow
-- [ ] T004 [P] Create base module files: src/library.rs, src/prompt.rs, src/data_dir.rs
+- [X] T004 [P] Create base module files: src/library.rs, src/prompt.rs, src/data_dir.rs
 
 ---
 
@@ -40,15 +40,15 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement data directory resolution in src/data_dir.rs with TWIG_DATA_DIR support
-- [ ] T006 [P] Create unit tests for data_dir.rs (inline module)
-- [ ] T007 Implement TOML parsing for twig.toml in src/library.rs
-- [ ] T008 [P] Create unit tests for library.rs TOML parsing (inline module)
-- [ ] T009 Implement Jinja2 template rendering in src/prompt.rs with Chainable mode
-- [ ] T010 [P] Create unit tests for prompt.rs template rendering (inline module)
-- [ ] T011 Setup MCP server structure in src/mcp.rs with ServerHandler trait
-- [ ] T012 Configure error handling infrastructure with Result<T, ErrorData> types
-- [ ] T013 Setup integration test framework in tests/ with tokio::io::duplex
+- [X] T005 Implement data directory resolution in src/data_dir.rs with TWIG_DATA_DIR support
+- [X] T006 [P] Create unit tests for data_dir.rs (inline module)
+- [X] T007 Implement TOML parsing for twig.toml in src/library.rs
+- [X] T008 [P] Create unit tests for library.rs TOML parsing (inline module)
+- [X] T009 Implement Jinja2 template rendering in src/prompt.rs with Chainable mode
+- [X] T010 [P] Create unit tests for prompt.rs template rendering (inline module)
+- [X] T011 Setup MCP server structure in src/mcp.rs with ServerHandler trait
+- [X] T012 Configure error handling infrastructure with Result<T, ErrorData> types
+- [X] T013 Setup integration test framework in tests/ with tokio::io::duplex
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -64,16 +64,16 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T014 [P] [US1] Contract test for prompts/list in tests/integration/test_list_prompts.rs
-- [ ] T015 [P] [US1] Unit test for library discovery in src/library.rs (test_library_scanning)
+- [X] T014 [P] [US1] Contract test for prompts/list in tests/integration/test_list_prompts.rs
+- [X] T015 [P] [US1] Unit test for library discovery in src/library.rs (test_library_scanning)
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Implement library discovery scanning in src/library.rs
-- [ ] T017 [US1] Implement prompts/list MCP handler in src/mcp.rs
-- [ ] T018 [US1] Add library name normalization (lowercase, underscores) in src/library.rs
-- [ ] T019 [US1] Add error handling for malformed libraries (log and skip)
-- [ ] T020 [US1] Implement empty list handling for no libraries scenario
+- [X] T016 [P] [US1] Implement library discovery scanning in src/library.rs
+- [X] T017 [US1] Implement prompts/list MCP handler in src/mcp.rs
+- [X] T018 [US1] Add library name normalization (lowercase, underscores) in src/library.rs
+- [X] T019 [US1] Add error handling for malformed libraries (log and skip)
+- [X] T020 [US1] Implement empty list handling for no libraries scenario
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -87,17 +87,17 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T021 [P] [US2] Contract test for prompts/get in tests/integration/test_get_prompt.rs
-- [ ] T022 [P] [US2] Unit test for template rendering with arguments in src/prompt.rs
+- [X] T021 [P] [US2] Contract test for prompts/get in tests/integration/test_get_prompt.rs
+- [X] T022 [P] [US2] Unit test for template rendering with arguments in src/prompt.rs
 
 ### Implementation for User Story 2
 
-- [ ] T023 [P] [US2] Implement prompt content loading from markdown files in src/prompt.rs
-- [ ] T024 [US2] Implement prompts/get MCP handler in src/mcp.rs
-- [ ] T025 [US2] Add argument validation (required vs optional) in src/prompt.rs
-- [ ] T026 [US2] Add template rendering with argument substitution in src/prompt.rs
-- [ ] T027 [US2] Implement error handling for missing prompt files
-- [ ] T028 [US2] Add support for optional arguments with Chainable mode
+- [X] T023 [P] [US2] Implement prompt content loading from markdown files in src/prompt.rs
+- [X] T024 [US2] Implement prompts/get MCP handler in src/mcp.rs
+- [X] T025 [US2] Add argument validation (required vs optional) in src/prompt.rs
+- [X] T026 [US2] Add template rendering with argument substitution in src/prompt.rs
+- [X] T027 [US2] Implement error handling for missing prompt files
+- [X] T028 [US2] Add support for optional arguments with Chainable mode
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -111,16 +111,16 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T029 [P] [US3] Integration test for malformed twig.toml handling in tests/integration/test_error_handling.rs
-- [ ] T030 [P] [US3] Unit test for error message generation in src/library.rs
+- [X] T029 [P] [US3] Integration test for malformed twig.toml handling in tests/integration/test_error_handling.rs
+- [X] T030 [P] [US3] Unit test for error message generation in src/library.rs
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] Enhance error messages for malformed twig.toml files in src/library.rs
-- [ ] T032 [US3] Add detailed error reporting for missing markdown files in src/prompt.rs
-- [ ] T033 [US3] Implement argument validation error messages in src/prompt.rs
-- [ ] T034 [US3] Add template rendering error details (line numbers) in src/prompt.rs
-- [ ] T035 [US3] Ensure error handling doesn't break library discovery
+- [X] T031 [P] [US3] Enhance error messages for malformed twig.toml files in src/library.rs
+- [X] T032 [US3] Add detailed error reporting for missing markdown files in src/prompt.rs
+- [X] T033 [US3] Implement argument validation error messages in src/prompt.rs
+- [X] T034 [US3] Add template rendering error details (line numbers) in src/prompt.rs
+- [X] T035 [US3] Ensure error handling doesn't break library discovery
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -130,12 +130,12 @@ description: "Task list for User Prompts via MCP feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T036 [P] Add comprehensive logging throughout all modules
+- [X] T036 [P] Add comprehensive logging throughout all modules
 - [ ] T037 [P] Performance optimization for large library scanning
 - [ ] T038 [P] Add file system watching for real-time library changes
-- [ ] T039 [P] Additional unit tests for edge cases in all modules
+- [X] T039 [P] Additional unit tests for edge cases in all modules
 - [ ] T040 Run quickstart.md validation with example libraries
-- [ ] T041 Code cleanup and documentation updates
+- [X] T041 Code cleanup and documentation updates
 
 ---
 
