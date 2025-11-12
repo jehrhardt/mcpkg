@@ -13,6 +13,3 @@ dir = "{{cwd}}/website"
 [tools]
 node = "lts"
 uv = "latest"
-
-[settings]
-python.uv_venv_auto = true

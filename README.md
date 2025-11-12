@@ -1,6 +1,6 @@
 # twig
 
-Help your coding agent twig.
+`twig`` is package manager for the context of AI coding agents that makes prompt libraries available via MCP.
 
 ## Prerequisites
 
