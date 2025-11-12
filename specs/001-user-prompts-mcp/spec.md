@@ -135,7 +135,7 @@ As a software engineer, I want to receive clear error messages when my prompt li
 ## Assumptions
 
 - User data directory location follows platform conventions (e.g., ~/.local/share/twig/prompts on Linux, ~/Library/Application Support/twig/prompts on macOS)
-- twig.toml files use TOML format with minimal schema: `name`, `description`, `arguments[]` where each argument has `name`, `description`, and `required` fields
+- twig.toml files use TOML format: `[prompts.prompt_name]` sections with optional `[[prompts.prompt_name.arguments]]` array-of-tables; each argument has `name` field and optional `description` and `required` fields (defaults to `required = false`)
 - Markdown files use standard markdown syntax and Jinja2 template syntax for argument substitution (e.g., `{{ argument_name }}`)
 - Library names are derived from directory names using normalization: convert to lowercase, replace spaces and special characters with underscores, remove leading/trailing underscores (e.g., "My-Coding Lib" → "my_coding_lib")
 - Prompt names within a library must be unique, but can be duplicated across different libraries
@@ -150,3 +150,11 @@ As a software engineer, I want to receive clear error messages when my prompt li
 - Q: What templating syntax should be used for substituting arguments into prompt content? → A: Use Jinja2 template syntax (e.g., `{{ argument_name }}`)
 - Q: How should the system handle special characters, spaces, and case in directory names when creating library names? → A: Convert to lowercase, replace spaces/special chars with underscores, remove leading/trailing underscores
 - Q: How should the system detect when libraries are added, removed, or modified? → A: Use file system watching (inotify/kqueue/FSEvents) for real-time change detection
+
+### Session 2025-11-12
+
+- Q: What TOML schema format for twig.toml: array-of-tables `[[prompts]]` or nested tables `[prompts.code_review]`? → A: Nested table format `[prompts.prompt_name]` with prompt name derived from the table key (Option B - minimal, prompt-focused)
+- Q: Should `required` field default to false for optional arguments? → A: Yes, omit `required` field for optional arguments; defaults to `required = false`
+- Q: Should argument `description` field be required or optional? → A: Optional - can be omitted and treated as None/null
+- Q: Support both simple-list format AND nested tables, or only nested? → A: Only nested tables - single schema for simplicity and consistency
+- Q: For arguments, use nested tables `[prompts.name.arguments.arg_name]` or array-of-tables `[[prompts.name.arguments]]` with explicit `name` field? → A: Array-of-tables format `[[prompts.prompt_name.arguments]]` with explicit `name` field for better readability and maintainability

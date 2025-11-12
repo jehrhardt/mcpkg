@@ -23,3 +23,10 @@
 - **MCP server**: Uses `rmcp` crate with stdio transport for Model Context Protocol
 - **CLI**: clap v4 with derive macros for command parsing
 - **Modules**: `cli` (command parsing), `mcp` (MCP server logic), `main` (entry point)
+
+## Active Technologies
+- Rust 2024 Edition (001-user-prompts-mcp)
+- File-based (user data directory with TOML config + markdown prompts) (001-user-prompts-mcp)
+
+## Recent Changes
+- 001-user-prompts-mcp: Added Rust 2024 Edition
